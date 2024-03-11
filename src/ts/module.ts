@@ -3,23 +3,25 @@
 import "../styles/style.scss";
 import DogBrowser from "./apps/dogBrowser";
 import { moduleId } from "./constants";
-import { MyModule } from "./types";
+import { ACN } from "./types";
 
-let module: MyModule;
+let module: ACN;
 
 Hooks.once("init", () => {
   console.log(`Initializing ${moduleId}`);
 
-  module = (game as Game).modules.get(moduleId) as MyModule;
+  module = (game as Game).modules.get(moduleId) as ACN;
   module.dogBrowser = new DogBrowser();
 });
 
-Hooks.on("renderActorDirectory", (_: Application, html: JQuery) => {
+Hooks.on("renderCombatTracker", (_: Application, html: JQuery) => {
   const button = $(
-    `<button class="cc-sidebar-button" type="button">🐶</button>`
+    `<a class="combat-button" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.open.label">
+      <i class="fa-regular fa-note-sticky" />
+    </button>`
   );
   button.on("click", () => {
     module.dogBrowser.render(true);
   });
-  html.find(".directory-header .action-buttons").append(button);
+  html.find(".combat-tracker-header > nav").append(button);
 });

@@ -14,3 +14,13 @@
     border: none;
   }
 }
+
+#sidebar .combat-sidebar {
+  .combat-tracker-header {
+    nav.encounters {
+      a.combat-button:last-of-type {
+        margin-left: auto;
+      }
+    }
+  }
+}

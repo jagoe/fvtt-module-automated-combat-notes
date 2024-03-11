@@ -1,17 +1,24 @@
 {
   "$schema": "https://json.schemastore.org/foundryvtt-manifest.json",
-  "id": "foundry-module-ts",
-  "title": "Typescript Template Module",
-  "description": "A template module using Typescript. You should change name, title, and description in module.json.",
+  "id": "fvtt-module-automated-combat-notes",
+  "title": "Automated Combat Notes",
+  "description": "A Foundry VTT module that allows GMs and players to open journal entries automatically once combat starts.",
+  "authors": [
+    {
+      "id": "jagoe",
+      "discord": "celtsfightnude",
+      "email": "fvtt-acn@trtl.dev"
+    }
+  ],
   "version": "1.0.0",
   "packs": [],
   "system": [],
   "dependencies": [],
   "scripts": [],
   "compatibility": {
-    "minimum": "9",
-    "verified": "10",
-    "maximum": "10"
+    "minimum": "11",
+    "verified": "11",
+    "maximum": "11"
   },
   "languages": [
     {
@@ -20,6 +27,10 @@
       "path": "languages/en.json"
     }
   ],
-  "styles": ["style.css"],
-  "esmodules": ["scripts/module.js"]
+  "styles": [
+    "style.css"
+  ],
+  "esmodules": [
+    "scripts/module.js"
+  ]
 }

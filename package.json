@@ -1,7 +1,7 @@
 {
-  "name": "foundry-module-ts",
+  "name": "fvtt-module-automated-combat-notes",
   "version": "1.0.0",
-  "description": "A template project for FoundryVTT modules using Typescript",
+  "description": "A Foundry VTT module that allows GMs and players to open journal entries automatically once combat starts.",
   "license": "MIT",
   "private": true,
   "scripts": {
