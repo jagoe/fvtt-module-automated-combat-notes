@@ -5,6 +5,9 @@
       "open": {
         "label": "Open Combat Journals"
       }
+    },
+    "note": {
+      "title": "Journal Entry"
     }
   }
 }

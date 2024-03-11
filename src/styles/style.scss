@@ -10,8 +10,10 @@
 
 .window-app .window-content section.acn-notes {
   flex: 100;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  margin-top: 10px;
+
+  .notes-drop-target {
+    border: 4px dashed #aaa;
+    padding: 1em;
+    font-size: 1.5em;
+  }
 }

@@ -1,7 +1,9 @@
 import { moduleId } from '../constants'
+import {CombatNote} from '../models/note'
 
 export default class Overview extends Application {
-    private imageUrl? = ''
+    // TODO: When loading, set name automatically
+    private notes: CombatNote[] = [{id: 'h7BN5ZNBTKvdzaS5', name: 'Test'}]
 
     override get title(): string {
         return (game as Game).i18n.localize('ACN.overview.title')
@@ -18,7 +20,7 @@ export default class Overview extends Application {
 
     override getData() {
         return {
-            imageUrl: this.imageUrl,
+            notes: [...this.notes],
         }
     }
 

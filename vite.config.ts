@@ -35,8 +35,28 @@ export default defineConfig({
             ],
             hook: 'writeBundle',
         }),
+        addWatchedFilesPlugin(),
     ],
 })
+
+function addWatchedFilesPlugin(): Plugin {
+    return {
+        name: 'add-watched-files',
+        async buildStart() {
+            this.addWatchFile('src/module.json')
+
+            const translations = await fsPromises.readdir('src/languages')
+            translations.forEach((file) => {
+                this.addWatchFile(`src/languages/${file}`)
+            })
+
+            const templates = await fsPromises.readdir('src/templates')
+            templates.forEach((file) => {
+                this.addWatchFile(`src/templates/${file}`)
+            })
+        },
+    }
+}
 
 function updateModuleManifestPlugin(): Plugin {
     return {
