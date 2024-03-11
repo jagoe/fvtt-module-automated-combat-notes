@@ -1,18 +1,9 @@
-.window-app .window-content section.module-dog-picture-container {
+.window-app .window-content section.acn-notes-container {
   flex: 100;
   display: flex;
   justify-content: center;
   align-content: center;
   margin-top: 10px;
-
-  .module-dog-placeholder {
-    font-size: 200px;
-  }
-
-  img.module-dog-image {
-    object-fit: contain;
-    border: none;
-  }
 }
 
 #sidebar .combat-sidebar {

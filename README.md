@@ -4,8 +4,15 @@ A Foundry VTT module that allows GMs and players to open journal entries automat
 
 ## Todo
 
-* [ ] Remove dog styles
-  * `.window-app .window-content section.module-dog-picture-container`
-* [ ] Remove dog translations
-  * `MYMODULE.x`
-* [ ] Remove dog code
+* Features
+  * Drag journal into list
+  * Delete from list
+  * Automatically open listed journals on combat start
+  * Add entry modes:
+    * For nth combat: Active in nth combat, remove entry afterwards
+    * Once: Active exactly once, remove entry afterwards
+    * Always
+  * Add entry event:
+    * Combat start
+    * Combat end
+    * Turn of actor: Select actor by dragging
