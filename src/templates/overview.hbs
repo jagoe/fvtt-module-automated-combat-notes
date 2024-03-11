@@ -20,9 +20,9 @@
               <a
                 class='content-link'
                 draggable='true'
-                data-uuid='JournalEntry.{{this.id}}'
+                data-uuid='{{this.uuid}}'
                 data-id='{{this.id}}'
-                data-type='JournalEntry'
+                data-type='{{this.type}}'
                 data-tooltip='Journal Entry'
               ><i class='fas fa-book-open'></i>{{this.name}}</a>
             </td>
@@ -31,12 +31,12 @@
       </tbody>
     </table>
     <div class='notes-drop-target'>
-      Drag a journal entry onto this area to add another note.
+      <span class='text'>Drag a journal entry onto this area to add another note.</span>
     </div>
   {{else}}
     <div class='notes-drop-target'>
-      You currently don't have any combat notes.<br />
-      Drag a journal entry onto this area to add your first note.
+      <span class='text'>You currently don't have any combat notes.<br />
+        Drag a journal entry onto this area to add your first note.</span>
     </div>
   {{/if}}
 </section>

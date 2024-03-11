@@ -12,8 +12,42 @@
   flex: 100;
 
   .notes-drop-target {
+    position: relative;
     border: 4px dashed #aaa;
     padding: 1em;
     font-size: 1.5em;
+    text-align: center;
+    transition: border-color 0.3s ease-in-out;
+
+    .text {
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    &::after {
+      content: '+';
+      font-size: 3em;
+      color: #666;
+      position: absolute;
+      margin: auto;
+      left: 50%;
+      top: 0;
+      line-height: 1em;
+      opacity: 0;
+
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    &.drag-over {
+      border-color: #666;
+
+      .text {
+        opacity: 0;
+      }
+
+      &::after {
+        opacity: 1;
+      }
+    }
   }
 }
