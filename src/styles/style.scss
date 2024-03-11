@@ -1,11 +1,3 @@
-.window-app .window-content section.acn-notes-container {
-  flex: 100;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  margin-top: 10px;
-}
-
 #sidebar .combat-sidebar {
   .combat-tracker-header {
     nav.encounters {
@@ -14,4 +6,12 @@
       }
     }
   }
+}
+
+.window-app .window-content section.acn-notes {
+  flex: 100;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin-top: 10px;
 }
