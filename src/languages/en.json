@@ -8,6 +8,10 @@
           "label": "Open Combat Notes Overview",
           "hint": "Opens a window with an overview of all your combat notes."
         }
+      },
+      "drop-target": {
+        "text": "Drag a journal entry onto this area to add another note.",
+        "textEmpty": "You currently don't have any combat notes. Drag a journal entry onto this area to add your first note."
       }
     },
     "table": {

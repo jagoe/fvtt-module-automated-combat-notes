@@ -11,6 +11,11 @@
 .window-app .window-content section.acn-notes {
   flex: 100;
 
+  .actions {
+    text-align: center;
+    width: 2em;
+  }
+
   .notes-drop-target {
     position: relative;
     border: 4px dashed #aaa;
@@ -24,18 +29,14 @@
       transition: opacity 0.3s ease-in-out;
     }
 
-    &::after {
-      content: '+';
-      font-size: 3em;
-      color: #666;
+    .fas {
       position: absolute;
-      margin: auto;
-      left: 50%;
-      top: 0;
-      line-height: 1em;
+      top: calc(50% - 20px);
+      left: calc(50% - 20px);
       opacity: 0;
-
       transition: opacity 0.3s ease-in-out;
+      font-size: 40px;
+      color: #666;
     }
 
     &.drag-over {
@@ -45,7 +46,7 @@
         opacity: 0;
       }
 
-      &::after {
+      .fas {
         opacity: 1;
       }
     }

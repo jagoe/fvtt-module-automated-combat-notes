@@ -11,6 +11,7 @@
       <thead>
         <tr>
           <th>{{localize 'ACN.table.journalEntry'}}</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -26,17 +27,21 @@
                 data-tooltip='Journal Entry'
               ><i class='fas fa-book-open'></i>{{this.name}}</a>
             </td>
+            <td class='actions'>
+              <a class='delete-note' data-uuid='{{this.uuid}}' title='Delete Note'><i class='fas fa-trash-alt'></i></a>
+            </td>
           </tr>
         {{/each}}
       </tbody>
     </table>
     <div class='notes-drop-target'>
-      <span class='text'>Drag a journal entry onto this area to add another note.</span>
+      <span class='text'>{{localize 'ACN.overview.drop-target.text'}}</span>
+      <i class='fas fa-plus'></i>
     </div>
   {{else}}
     <div class='notes-drop-target'>
-      <span class='text'>You currently don't have any combat notes.<br />
-        Drag a journal entry onto this area to add your first note.</span>
+      <span class='text'>{{localize 'ACN.overview.drop-target.textEmpty'}}</span>
+      <i class='fas fa-plus'></i>
     </div>
   {{/if}}
 </section>

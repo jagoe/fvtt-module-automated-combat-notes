@@ -1,8 +1,10 @@
-import { COMBAT_NOTE_STORAGE_TYPE, JOURNAL_ENTRY_TYPE, moduleId } from '../constants'
-import { CombatNote, JournalEntryData } from '../models/note'
+import { JOURNAL_ENTRY_TYPE, moduleId } from '../constants'
+import { JournalEntryData } from '../models/note'
+import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
+import { loadNotes, saveNotes } from '../services/storage'
 
 export default class AcnOverview extends Application {
-  private notes: CombatNote[] = []
+  // private notes: CombatNote[] = []
 
   private get game() {
     return game as Game
@@ -26,21 +28,21 @@ export default class AcnOverview extends Application {
       template: `modules/${moduleId}/templates/overview.hbs`,
       width: 720,
       height: 720,
+      resizable: true,
     }) as ApplicationOptions
   }
 
+  constructor() {
+    super()
+
+    this.registerNoteHooks()
+  }
+
   override getData() {
-    const storedNotes = (this.game.user?.getFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE) as JournalEntryData[]) ?? []
-
-    this.notes = storedNotes
-      .map((note) => this.getNoteFromJournalEntryData(note).note)
-      // We ignore errors and empty notes because they shouldn't have been stored anyway
-      .filter((note) => !!note) as CombatNote[]
-
-    this.notes.forEach(this.registerNoteHooks.bind(this))
+    const notes = loadNotes()
 
     return {
-      notes: [...this.notes],
+      notes: [...notes],
     }
   }
 
@@ -51,8 +53,9 @@ export default class AcnOverview extends Application {
 
     dropTargets.on('dragover', handleDragOver)
     dropTargets.on('dragleave', handleDragLeave)
-
     dropTargets.on('drop', this.handleDrop.bind(this))
+
+    html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
   }
 
   private handleDrop(event: JQuery.DropEvent) {
@@ -63,7 +66,7 @@ export default class AcnOverview extends Application {
 
     const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
 
-    const { note, error } = this.getNoteFromJournalEntryData(data)
+    const { note, error } = getNoteFromJournalEntryData(data)
 
     if (error) {
       ui.notifications?.error(this.game.i18n.localize(error))
@@ -75,62 +78,46 @@ export default class AcnOverview extends Application {
       return
     }
 
-    this.notes.push(note)
-
-    if (!this.game.user) {
-      ui.notifications?.error(this.game.i18n.localize('ACN.overview.error.missingUser'))
-      return
-    }
-
-    this.game.user.setFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE, this.notes.map(mapNoteToJournalEntryData))
+    saveNotes([...loadNotes(), note])
 
     this.render()
   }
 
-  private getNoteFromJournalEntryData(data: JournalEntryData | null): { error?: string; note?: CombatNote } {
-    if (data === null || data.uuid === undefined) {
-      // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
-      return {}
+  private handleRemoveNote(event: JQuery.ClickEvent) {
+    event.preventDefault()
+
+    const button = event.currentTarget as HTMLElement
+    const noteId = button.dataset.uuid
+
+    if (!noteId) {
+      return
     }
 
-    const { uuid, type } = data
+    saveNotes(loadNotes().filter((note) => note.uuid !== noteId))
 
-    if (type !== JOURNAL_ENTRY_TYPE) {
-      // Not necessarily an error, but also not a note
-      return {}
-    }
-
-    const [, id] = uuid.split('.')
-
-    const entry = this.game.journal?.get(id)
-
-    if (!entry) {
-      return { error: 'ACN.overview.error.unknownJournalEntry' }
-    }
-
-    const name = entry?.name ?? ''
-
-    if (!name) {
-      return { error: 'ACN.overview.error.missingJournalEntryName' }
-    }
-
-    return { note: { uuid, id, type, name } }
+    this.render()
   }
 
-  private registerNoteHooks(note: CombatNote): void {
+  private registerNoteHooks(): void {
     Hooks.on('updateJournalEntry', (journal: JournalEntry): void => {
-      if (journal.id !== note.id) {
+      const notes = loadNotes().filter((n) => n.id === journal.id)
+
+      if (!notes.length) {
         return
       }
 
       const { name } = journal
 
-      if (name === note.name || name === null) {
-        return
-      }
+      notes.forEach((note) => {
+        if (name === note.name || name === null) {
+          return
+        }
 
-      note.name = name
+        note.name = name
+      })
+
       this.render()
+      // No need to persist, because the name will get fetched when loading anyway
     })
   }
 }
@@ -156,8 +143,4 @@ function handleDragLeave(event: JQuery.DragLeaveEvent) {
 
   const target = event.currentTarget as HTMLElement
   target.classList.remove('drag-over')
-}
-
-function mapNoteToJournalEntryData(note: CombatNote): JournalEntryData {
-  return { type: note.type, uuid: note.uuid }
 }
