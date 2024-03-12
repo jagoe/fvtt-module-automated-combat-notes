@@ -1,19 +1,17 @@
 {
-  "$schema": "https://json.schemastore.org/foundryvtt-manifest.json",
+  "$schema": "https://json.schemastore.org/foundryvtt-module-manifest.json",
   "id": "fvtt-module-automated-combat-notes",
   "title": "Automated Combat Notes",
   "description": "A Foundry VTT module that allows GMs and players to open journal entries automatically once combat starts.",
   "authors": [
     {
-      "id": "jagoe",
+      "name": "jagoe",
       "discord": "celtsfightnude",
       "email": "fvtt-acn@trtl.dev"
     }
   ],
   "version": "1.0.0",
   "packs": [],
-  "system": [],
-  "dependencies": [],
   "scripts": [],
   "compatibility": {
     "minimum": "11",
@@ -32,5 +30,6 @@
   ],
   "esmodules": [
     "scripts/module.js"
-  ]
+  ],
+  "socket": true
 }
