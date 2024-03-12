@@ -10,8 +10,23 @@ let module: ACN
 Hooks.once('init', () => {
   console.log(`Initializing ${moduleId}`)
 
-  module = (game as Game).modules.get(moduleId) as ACN
+  let g = game as Game
+  module = g.modules.get(moduleId) as ACN
   module.overview = new AcnOverview()
+
+  g.keybindings.register(moduleId, 'show-acn-overview', {
+    name: 'ACN.overview.open.keybinding.label',
+    hint: 'ACN.overview.open.keybinding.hint',
+    editable: [
+      {
+        key: 'J',
+        modifiers: [KeyboardManager.MODIFIER_KEYS.ALT],
+      },
+    ],
+    onDown: () => module.overview.toggle(),
+    restricted: false,
+    precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+  })
 })
 
 Hooks.on('renderCombatTracker', (_: Application, html: JQuery) => {

@@ -4,8 +4,8 @@ A Foundry VTT module that allows GMs and players to open journal entries automat
 
 ## Todo
 
-* Add configurable shortcut
 * Delete from list
+* Fix styling for empty drop area
 * Automatically open listed journals on combat start
 * Add entry modes:
   * For nth combat: Active in nth combat, remove entry afterwards

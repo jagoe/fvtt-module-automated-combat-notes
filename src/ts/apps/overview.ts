@@ -12,6 +12,14 @@ export default class AcnOverview extends Application {
     return this.game.i18n.localize('ACN.overview.title')
   }
 
+  public toggle(): void {
+    if (this.rendered) {
+      this.close()
+    } else {
+      this.render(true)
+    }
+  }
+
   static override get defaultOptions(): ApplicationOptions {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: 'acn-overview',

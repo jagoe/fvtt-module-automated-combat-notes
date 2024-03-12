@@ -3,7 +3,11 @@
     "overview": {
       "title": "Automated Combat Notes",
       "open": {
-        "tooltip": "Open Combat Journals"
+        "tooltip": "Open Combat Notes Overview",
+        "keybinding": {
+          "label": "Open Combat Notes Overview",
+          "hint": "Opens a window with an overview of all your combat notes."
+        }
       }
     },
     "table": {
