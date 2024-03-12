@@ -3,11 +3,16 @@
     "overview": {
       "title": "Automated Combat Notes",
       "open": {
-        "label": "Open Combat Journals"
+        "tooltip": "Open Combat Journals"
       }
     },
-    "note": {
-      "title": "Journal Entry"
+    "table": {
+      "journalEntry": "Journal Entry"
+    },
+    "error": {
+      "missingUser": "There was an error retrieving your user data. Please refresh the page and try again.",
+      "unknownJournalEntry": "There was an error reading the added journal entry. Please try again.",
+      "missingJournalEntryName": "There was an error retrieving the journal entry's name. Please make sure it has one and then try again."
     }
   }
 }
