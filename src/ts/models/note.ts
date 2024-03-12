@@ -4,6 +4,7 @@ export type CombatNote = {
   type: string
   name: string
 }
+
 export type JournalEntryData = {
   uuid: string
   type: string

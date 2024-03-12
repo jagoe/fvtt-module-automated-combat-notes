@@ -1,19 +1,15 @@
-import { moduleId } from '../constants'
+import { COMBAT_NOTE_STORAGE_TYPE, JOURNAL_ENTRY_TYPE, moduleId } from '../constants'
 import { CombatNote, JournalEntryData } from '../models/note'
 
-export default class Overview extends Application {
-  // TODO: When loading, set name automatically
-  private notes: CombatNote[] = [
-    {
-      uuid: 'JournalEntry.h7BN5ZNBTKvdzaS5',
-      id: 'h7BN5ZNBTKvdzaS5',
-      type: 'JournalEntry',
-      name: 'Test',
-    },
-  ]
+export default class AcnOverview extends Application {
+  private notes: CombatNote[] = []
+
+  private get game() {
+    return game as Game
+  }
 
   override get title(): string {
-    return (game as Game).i18n.localize('ACN.overview.title')
+    return this.game.i18n.localize('ACN.overview.title')
   }
 
   static override get defaultOptions(): ApplicationOptions {
@@ -26,7 +22,15 @@ export default class Overview extends Application {
   }
 
   override getData() {
-    // TODO: Initialize notes
+    // TODO: Move store methods to a service
+    const storedNotes = (this.game.user?.getFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE) as JournalEntryData[]) ?? []
+
+    // TODO: Hooks on note name changes? There has to be a better way to link these
+    this.notes = storedNotes
+      .map((note) => this.getNoteFromJournalEntryData(note).note)
+      // We ignore errors and empty notes because they shouldn't have been stored anyway
+      .filter((note) => !!note) as CombatNote[]
+
     return {
       notes: [...this.notes],
     }
@@ -37,84 +41,99 @@ export default class Overview extends Application {
 
     const dropTargets = html.find('.notes-drop-target')
 
-    // TODO: Extract event handlers to methods
-    dropTargets.on('dragover', (event) => {
-      const data: JournalEntryData | null = JSON.parse(
-        event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null',
-      )
+    dropTargets.on('dragover', handleDragOver)
+    dropTargets.on('dragleave', handleDragLeave)
 
-      if (data === null || data.uuid === undefined) {
-        return
-      }
-
-      // TODO: Move 'JournalEntry' to a constant
-      if (data.type !== 'JournalEntry') {
-        return
-      }
-
-      const target = event.currentTarget as HTMLElement
-      target.classList.add('drag-over')
-      event.preventDefault()
-    })
-
-    dropTargets.on('dragleave', (event) => {
-      event.preventDefault()
-
-      const target = event.currentTarget as HTMLElement
-      target.classList.remove('drag-over')
-    })
-
-    dropTargets.on('drop', (event) => {
-      event.preventDefault()
-
-      const g = game as Game
-      const target = event.currentTarget as HTMLElement
-      target.classList.remove('drag-over')
-
-      const data: JournalEntryData | null = JSON.parse(
-        event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null',
-      )
-
-      if (data === null || data.uuid === undefined) {
-        ui.notifications?.error(g.i18n.localize('ACN.overview.error.invalidElement'))
-        return
-      }
-
-      const [type, id] = data.uuid.split('.')
-
-      if (type !== 'JournalEntry') {
-        // We can just ignore this, because nothing should happen
-        return
-      }
-
-      const entry = g.journal?.get(id)
-
-      if (!entry) {
-        ui.notifications?.error(g.i18n.localize('ACN.overview.error.unknownJournalEntry'))
-
-        return
-      }
-
-      const name = entry.name
-
-      if (!name) {
-        ui.notifications?.error(g.i18n.localize('ACN.overview.error.missingJournalEntryName'))
-
-        return
-      }
-
-      const note: CombatNote = {
-        uuid: data.uuid,
-        id,
-        type,
-        name: entry.name,
-      }
-
-      this.notes.push(note)
-
-      // TODO: Persist notes
-
-      this.render()
-    })
+    dropTargets.on('drop', this.handleDrop.bind(this))
   }
+
+  // TODO: See if this can get cleaned up or structured better
+  private handleDrop(event: JQuery.DropEvent) {
+    event.preventDefault()
+
+    const target = event.currentTarget as HTMLElement
+    target.classList.remove('drag-over')
+
+    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+
+    const { note, error } = this.getNoteFromJournalEntryData(data)
+
+    if (error) {
+      ui.notifications?.error(this.game.i18n.localize(error))
+      return
+    }
+
+    if (!note) {
+      // Invalid data was dropped, so we just ignore it
+      return
+    }
+
+    this.notes.push(note)
+
+    if (!this.game.user) {
+      ui.notifications?.error(this.game.i18n.localize('ACN.overview.error.missingUser'))
+      return
+    }
+
+    // TODO: Move store methods to a service
+    this.game.user.setFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE, this.notes.map(mapNoteToJournalEntryData))
+
+    this.render()
+  }
+
+  private getNoteFromJournalEntryData(data: JournalEntryData | null): { error?: string; note?: CombatNote } {
+    if (data === null || data.uuid === undefined) {
+      return { error: 'ACN.overview.error.invalidElement' }
+    }
+
+    const { uuid, type } = data
+
+    if (type !== JOURNAL_ENTRY_TYPE) {
+      // Not necessarily an error, but also not a note
+      return {}
+    }
+
+    const [, id] = uuid.split('.')
+
+    const entry = this.game.journal?.get(id)
+
+    if (!entry) {
+      return { error: 'ACN.overview.error.unknownJournalEntry' }
+    }
+
+    const name = entry?.name ?? ''
+
+    if (!name) {
+      return { error: 'ACN.overview.error.missingJournalEntryName' }
+    }
+
+    return { note: { uuid, id, type, name } }
+  }
+}
+
+function handleDragOver(event: JQuery.DragOverEvent) {
+  const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+
+  if (data === null || data.uuid === undefined) {
+    return
+  }
+
+  if (data.type !== JOURNAL_ENTRY_TYPE) {
+    return
+  }
+
+  const target = event.currentTarget as HTMLElement
+  target.classList.add('drag-over')
+  event.preventDefault()
+}
+
+function handleDragLeave(event: JQuery.DragLeaveEvent) {
+  event.preventDefault()
+
+  const target = event.currentTarget as HTMLElement
+  target.classList.remove('drag-over')
+}
+
+function mapNoteToJournalEntryData(note: CombatNote): JournalEntryData {
+  return { type: note.type, uuid: note.uuid }
 }
