@@ -22,14 +22,14 @@ export default class AcnOverview extends Application {
   }
 
   override getData() {
-    // TODO: Move store methods to a service
     const storedNotes = (this.game.user?.getFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE) as JournalEntryData[]) ?? []
 
-    // TODO: Hooks on note name changes? There has to be a better way to link these
     this.notes = storedNotes
       .map((note) => this.getNoteFromJournalEntryData(note).note)
       // We ignore errors and empty notes because they shouldn't have been stored anyway
       .filter((note) => !!note) as CombatNote[]
+
+    this.notes.forEach(this.registerNoteHooks.bind(this))
 
     return {
       notes: [...this.notes],
@@ -47,7 +47,6 @@ export default class AcnOverview extends Application {
     dropTargets.on('drop', this.handleDrop.bind(this))
   }
 
-  // TODO: See if this can get cleaned up or structured better
   private handleDrop(event: JQuery.DropEvent) {
     event.preventDefault()
 
@@ -75,7 +74,6 @@ export default class AcnOverview extends Application {
       return
     }
 
-    // TODO: Move store methods to a service
     this.game.user.setFlag(moduleId, COMBAT_NOTE_STORAGE_TYPE, this.notes.map(mapNoteToJournalEntryData))
 
     this.render()
@@ -83,7 +81,8 @@ export default class AcnOverview extends Application {
 
   private getNoteFromJournalEntryData(data: JournalEntryData | null): { error?: string; note?: CombatNote } {
     if (data === null || data.uuid === undefined) {
-      return { error: 'ACN.overview.error.invalidElement' }
+      // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
+      return {}
     }
 
     const { uuid, type } = data
@@ -108,6 +107,23 @@ export default class AcnOverview extends Application {
     }
 
     return { note: { uuid, id, type, name } }
+  }
+
+  private registerNoteHooks(note: CombatNote): void {
+    Hooks.on('updateJournalEntry', (journal: JournalEntry): void => {
+      if (journal.id !== note.id) {
+        return
+      }
+
+      const { name } = journal
+
+      if (name === note.name || name === null) {
+        return
+      }
+
+      note.name = name
+      this.render()
+    })
   }
 }
 
