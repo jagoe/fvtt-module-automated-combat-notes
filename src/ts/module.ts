@@ -21,7 +21,7 @@ Hooks.once('init', () => {
     hint: 'ACN.overview.open.keybinding.hint',
     editable: [
       {
-        key: 'J',
+        key: 'KeyJ',
         modifiers: [KeyboardManager.MODIFIER_KEYS.ALT],
       },
     ],
