@@ -32,15 +32,7 @@ Hooks.once('init', () => {
 })
 
 Hooks.on('renderCombatTracker', (_: Application, html: JQuery) => {
-  const button = $(
-    `<a class="combat-button" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.overview.open.tooltip">
-      <i class="fa-regular fa-note-sticky" />
-    </button>`,
-  )
-  button.on('click', () => {
-    module.overview.render(true)
-  })
-  html.find('.combat-tracker-header > nav').append(button)
+  module.overview.appendDisplayButton(html.find('.combat-tracker-header .encounter-controls'))
 })
 
 Hooks.on(DisplayEvent.CombatStart, () => {

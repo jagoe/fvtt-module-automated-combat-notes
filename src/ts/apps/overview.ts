@@ -60,6 +60,18 @@ export default class AcnOverview extends Application {
     html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
   }
 
+  public appendDisplayButton(element: JQuery<HTMLElement>): void {
+    const button = $(
+      `<a class="combat-button" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.overview.open.tooltip">
+        <i class="fa-regular fa-note-sticky" />
+      </button>`,
+    )
+    button.on('click', () => {
+      this.render(true)
+    })
+    element.append(button)
+  }
+
   private handleDrop(event: JQuery.DropEvent) {
     event.preventDefault()
 
