@@ -30,5 +30,6 @@
   ],
   "esmodules": [
     "scripts/module.js"
-  ]
+  ],
+  "socket": true
 }

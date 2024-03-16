@@ -10,4 +10,7 @@ export enum ERROR {
   UnknownJournalEntry = 'ACN.error.unknownJournalEntry',
   UnknownJournalEntryId = 'ACN.error.unknownJournalEntryId',
 }
+
+export enum MODULE_EVENT {
+  DisplayNotes = 'DisplayNotes',
 }
