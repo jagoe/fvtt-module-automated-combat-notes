@@ -16,11 +16,12 @@
     },
     "table": {
       "journalEntry": "Journal Entry"
-    },
-    "error": {
-      "missingUser": "There was an error retrieving your user data. Please refresh the page and try again.",
-      "unknownJournalEntry": "There was an error reading the added journal entry. Please try again.",
-      "missingJournalEntryName": "There was an error retrieving the journal entry's name. Please make sure it has one and then try again."
     }
+  },
+  "error": {
+    "missingUser": "There was an error retrieving your user data. Please refresh the page and try again.",
+    "unknownJournalEntry": "There was an error reading the added journal entry. Please try again.",
+    "unknownJournalEntryId": "There was an error displaying the journal entry with the ID",
+    "missingJournalEntryName": "There was an error retrieving the journal entry's name. Please make sure it has one and then try again."
   }
 }

@@ -1,4 +1,4 @@
-import { JOURNAL_ENTRY_TYPE, moduleId } from '../constants'
+import { JOURNAL_ENTRY_TYPE, MODULE_ID } from '../constants'
 import { CombatNote, JournalEntryData } from '../models/note'
 import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
@@ -25,7 +25,7 @@ export default class AcnOverview extends Application {
   static override get defaultOptions(): ApplicationOptions {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: 'acn-overview',
-      template: `modules/${moduleId}/templates/overview.hbs`,
+      template: `modules/${MODULE_ID}/templates/overview.hbs`,
       width: 720,
       height: 720,
       resizable: true,
@@ -71,7 +71,7 @@ export default class AcnOverview extends Application {
     const { note, error } = getNoteFromJournalEntryData(data)
 
     if (error) {
-      ui.notifications?.error(this.game.i18n.localize(error))
+      ui.notifications?.error(error, { localize: true, permanent: true })
       return
     }
 

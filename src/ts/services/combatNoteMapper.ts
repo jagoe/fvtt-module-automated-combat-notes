@@ -1,4 +1,4 @@
-import { JOURNAL_ENTRY_TYPE } from '../constants'
+import { ERRORS, JOURNAL_ENTRY_TYPE } from '../constants'
 import { CombatNote, JournalEntryData } from '../models'
 
 export function mapNoteToJournalEntryData(note: CombatNote): JournalEntryData {
@@ -24,14 +24,29 @@ export function getNoteFromJournalEntryData(data: JournalEntryData | null): { er
   const entry = g.journal?.get(id)
 
   if (!entry) {
-    return { error: 'ACN.overview.error.unknownJournalEntry' }
+    return { error: ERRORS.UNKNOWN_JOURNAL_ENTRY }
   }
 
   const name = entry?.name ?? ''
 
   if (!name) {
-    return { error: 'ACN.overview.error.missingJournalEntryName' }
+    return { error: ERRORS.MISSING_JOURNAL_ENTRY_NAME }
   }
 
   return { note: { uuid, id, type, name } }
+}
+
+export function mapNoteToJournalEntry(note: CombatNote): {
+  id: string
+  error?: string
+  entry?: JournalEntry
+} {
+  const g = game as Game
+  const entry = g.journal?.get(note.id)
+
+  if (!entry) {
+    return { id: note.id, error: ERRORS.UNKNOWN_JOURNAL_ENTRY_ID }
+  }
+
+  return { id: note.id, entry }
 }
