@@ -1,4 +1,4 @@
-import { COMBAT_NOTE_STORAGE_TYPE, ERRORS, MODULE_ID } from '../constants'
+import { COMBAT_NOTE_STORAGE_TYPE, ERROR, MODULE_ID } from '../constants'
 import { CombatNote, JournalEntryData } from '../models'
 import { getNoteFromJournalEntryData, mapNoteToJournalEntryData } from './combatNoteMapper'
 
@@ -6,7 +6,7 @@ export function saveNotes(notes: CombatNote[]) {
   const g = game as Game
 
   if (!g.user) {
-    ui.notifications?.error(ERRORS.MISSING_USER, { localize: true, permanent: true })
+    ui.notifications?.error(ERROR.MissingUser, { localize: true, permanent: true })
     return
   }
 
