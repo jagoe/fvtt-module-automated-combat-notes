@@ -1,10 +1,10 @@
 import { JOURNAL_ENTRY_TYPE, moduleId } from '../constants'
-import { JournalEntryData } from '../models/note'
+import { CombatNote, JournalEntryData } from '../models/note'
 import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
 
 export default class AcnOverview extends Application {
-  // private notes: CombatNote[] = []
+  private notes: CombatNote[] = []
 
   private get game() {
     return game as Game
@@ -39,10 +39,12 @@ export default class AcnOverview extends Application {
   }
 
   override getData() {
-    const notes = loadNotes()
+    if (!this.notes.length) {
+      this.notes = loadNotes()
+    }
 
     return {
-      notes: [...notes],
+      notes: [...this.notes],
     }
   }
 
@@ -78,7 +80,8 @@ export default class AcnOverview extends Application {
       return
     }
 
-    saveNotes([...loadNotes(), note])
+    this.notes = [...this.notes, note]
+    saveNotes(this.notes)
 
     this.render()
   }
@@ -87,20 +90,26 @@ export default class AcnOverview extends Application {
     event.preventDefault()
 
     const button = event.currentTarget as HTMLElement
-    const noteId = button.dataset.uuid
+    const { uuid, index } = button.dataset
 
-    if (!noteId) {
+    if (!uuid) {
       return
     }
 
-    saveNotes(loadNotes().filter((note) => note.uuid !== noteId))
+    console.log(
+      100,
+      this.notes.filter((note, i) => note.uuid !== uuid && i !== Number(index)),
+    )
+
+    this.notes = this.notes.filter((note, i) => note.uuid !== uuid || i !== Number(index))
+    saveNotes(this.notes)
 
     this.render()
   }
 
   private registerNoteHooks(): void {
     Hooks.on('updateJournalEntry', (journal: JournalEntry): void => {
-      const notes = loadNotes().filter((n) => n.id === journal.id)
+      const notes = this.notes.filter((n) => n.id === journal.id)
 
       if (!notes.length) {
         return
@@ -116,8 +125,8 @@ export default class AcnOverview extends Application {
         note.name = name
       })
 
-      this.render()
       // No need to persist, because the name will get fetched when loading anyway
+      this.render()
     })
   }
 }
