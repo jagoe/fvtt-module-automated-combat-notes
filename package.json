@@ -1,7 +1,7 @@
 {
   "name": "fvtt-module-automated-combat-notes",
   "version": "1.0.0",
-  "description": "A Foundry VTT module that allows GMs and players to open journal entries automatically once combat starts.",
+  "description": "A Foundry VTT module that allows GMs and players to specify journal entries that get opened automatically once combat starts.",
   "license": "MIT",
   "private": true,
   "scripts": {

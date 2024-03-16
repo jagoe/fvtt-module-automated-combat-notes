@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/foundryvtt-module-manifest.json",
   "id": "fvtt-module-automated-combat-notes",
   "title": "Automated Combat Notes",
-  "description": "A Foundry VTT module that allows GMs and players to open journal entries automatically once combat starts.",
+  "description": "A Foundry VTT module that allows GMs and players to specify journal entries that get opened automatically once combat starts.",
   "authors": [
     {
       "name": "jagoe",
