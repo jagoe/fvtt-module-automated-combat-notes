@@ -43,8 +43,6 @@ export default class AcnOverview extends Application {
       this.notes = await loadNotes()
     }
 
-    console.debug(100, this.notes)
-
     return {
       notes: [...this.notes],
     }

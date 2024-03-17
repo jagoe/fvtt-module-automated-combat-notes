@@ -3,7 +3,7 @@ import { CombatNote, JournalEntryData } from '../models'
 import { AnyDocument } from '../types'
 
 export function mapNoteToJournalEntryData(note: CombatNote): JournalEntryData {
-  return { type: note.type, uuid: note.uuid }
+  return { type: note.type, uuid: note.uuid, anchor: note.anchor }
 }
 
 export async function getNoteFromJournalEntryData(data: JournalEntryData | null): Promise<{
@@ -15,7 +15,7 @@ export async function getNoteFromJournalEntryData(data: JournalEntryData | null)
     return {}
   }
 
-  const { uuid, type } = data
+  const { uuid, type, anchor } = data
 
   if (!VALID_DOCUMENT_TYPES.includes(type)) {
     // Not necessarily an error, but also not a note
@@ -35,8 +35,13 @@ export async function getNoteFromJournalEntryData(data: JournalEntryData | null)
   }
 
   const anchorDocument = doc as unknown as { toAnchor: () => HTMLAnchorElement }
+  const anchorElement = anchorDocument.toAnchor()
+  if (anchor?.slug) {
+    anchorElement.dataset.hash = anchor.slug
+    anchorElement.innerHTML += ` &mdash; ${anchor.name}`
+  }
 
-  return { note: { uuid, type, name, anchor: anchorDocument.toAnchor().outerHTML } }
+  return { note: { uuid, type, name, anchorElement: anchorElement.outerHTML, anchor } }
 }
 
 export async function mapNoteToDocument(note: CombatNote): Promise<{
