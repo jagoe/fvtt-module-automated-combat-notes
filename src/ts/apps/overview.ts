@@ -38,9 +38,9 @@ export default class AcnOverview extends Application {
     this.registerNoteHooks()
   }
 
-  override getData() {
+  override async getData() {
     if (!this.notes.length) {
-      this.notes = loadNotes()
+      this.notes = await loadNotes()
     }
 
     return {
@@ -53,16 +53,20 @@ export default class AcnOverview extends Application {
 
     const dropTargets = html.find('.notes-drop-target')
 
-    dropTargets.on('dragover', handleDragOver)
-    dropTargets.on('dragleave', handleDragLeave)
+    dropTargets.on('dragover', this.handleDragOver.bind(this))
+    dropTargets.on('dragleave', this.handleDragLeave.bind(this))
     dropTargets.on('drop', this.handleDrop.bind(this))
 
     html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
   }
 
   public appendDisplayButton(element: JQuery<HTMLElement>): void {
+    if (element.find('.open-combat-notes').length) {
+      return
+    }
+
     const button = $(
-      `<a class="combat-button" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.overview.open.tooltip">
+      `<a class="combat-button open-combat-notes" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.overview.open.tooltip">
         <i class="fa-regular fa-note-sticky" />
       </button>`,
     )
@@ -72,56 +76,9 @@ export default class AcnOverview extends Application {
     element.append(button)
   }
 
-  private handleDrop(event: JQuery.DropEvent) {
-    event.preventDefault()
-
-    const target = event.currentTarget as HTMLElement
-    target.classList.remove('drag-over')
-
-    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
-
-    const { note, error } = getNoteFromJournalEntryData(data)
-
-    if (error) {
-      ui.notifications?.error(error, { localize: true, permanent: true })
-      return
-    }
-
-    if (!note) {
-      // Invalid data was dropped, so we just ignore it
-      return
-    }
-
-    this.notes = [...this.notes, note]
-    saveNotes(this.notes)
-
-    this.render()
-  }
-
-  private handleRemoveNote(event: JQuery.ClickEvent) {
-    event.preventDefault()
-
-    const button = event.currentTarget as HTMLElement
-    const { uuid, index } = button.dataset
-
-    if (!uuid) {
-      return
-    }
-
-    console.log(
-      100,
-      this.notes.filter((note, i) => note.uuid !== uuid && i !== Number(index)),
-    )
-
-    this.notes = this.notes.filter((note, i) => note.uuid !== uuid || i !== Number(index))
-    saveNotes(this.notes)
-
-    this.render()
-  }
-
   private registerNoteHooks(): void {
     Hooks.on('updateJournalEntry', (journal: JournalEntry): void => {
-      const notes = this.notes.filter((n) => n.id === journal.id)
+      const notes = this.notes.filter((n) => n.uuid === journal.uuid)
 
       if (!notes.length) {
         return
@@ -141,27 +98,69 @@ export default class AcnOverview extends Application {
       this.render()
     })
   }
-}
 
-function handleDragOver(event: JQuery.DragOverEvent) {
-  const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+  private handleDragOver(event: JQuery.DragOverEvent) {
+    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
 
-  if (data === null || data.uuid === undefined) {
-    return
+    if (data === null || data.uuid === undefined) {
+      return
+    }
+
+    if (data.type !== JOURNAL_ENTRY_TYPE) {
+      return
+    }
+
+    const target = event.currentTarget as HTMLElement
+    target.classList.add('drag-over')
+    event.preventDefault()
   }
 
-  if (data.type !== JOURNAL_ENTRY_TYPE) {
-    return
+  private async handleDrop(event: JQuery.DropEvent) {
+    event.preventDefault()
+
+    const target = event.currentTarget as HTMLElement
+    target.classList.remove('drag-over')
+
+    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+
+    const { note, error } = await getNoteFromJournalEntryData(data)
+
+    if (error) {
+      ui.notifications?.error(error, { localize: true, permanent: true })
+      return
+    }
+
+    if (!note) {
+      // Invalid data was dropped, so we just ignore it
+      return
+    }
+
+    this.notes = [...this.notes, note]
+    saveNotes(this.notes)
+
+    this.render()
   }
 
-  const target = event.currentTarget as HTMLElement
-  target.classList.add('drag-over')
-  event.preventDefault()
-}
+  private handleDragLeave(event: JQuery.DragLeaveEvent) {
+    event.preventDefault()
 
-function handleDragLeave(event: JQuery.DragLeaveEvent) {
-  event.preventDefault()
+    const target = event.currentTarget as HTMLElement
+    target.classList.remove('drag-over')
+  }
 
-  const target = event.currentTarget as HTMLElement
-  target.classList.remove('drag-over')
+  private handleRemoveNote(event: JQuery.ClickEvent) {
+    event.preventDefault()
+
+    const button = event.currentTarget as HTMLElement
+    const { uuid, index } = button.dataset
+
+    if (!uuid) {
+      return
+    }
+
+    this.notes = this.notes.filter((note, i) => note.uuid !== uuid || i !== Number(index))
+    saveNotes(this.notes)
+
+    this.render()
+  }
 }

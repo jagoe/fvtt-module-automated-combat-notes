@@ -4,10 +4,6 @@ export type CombatNote = {
    */
   uuid: string
   /**
-   * Foundry app ID
-   */
-  id: string
-  /**
    * Foundry app type
    */
   type: string

@@ -13,15 +13,16 @@ export function saveNotes(notes: CombatNote[]) {
   g.user.setFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE, notes.map(mapNoteToJournalEntryData))
 }
 
-export function loadNotes(): CombatNote[] {
+export async function loadNotes(): Promise<CombatNote[]> {
   const g = game as Game
 
-  const storedNotes = (g.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as JournalEntryData[]) ?? []
+  const storedNoteData = (g.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as JournalEntryData[]) ?? []
+  const noteResults = await Promise.all(storedNoteData.map((note) => getNoteFromJournalEntryData(note)))
 
-  const notes = storedNotes
-    .map((note) => getNoteFromJournalEntryData(note).note)
+  const notes = noteResults
     // We ignore errors and empty notes because they shouldn't have been stored anyway
-    .filter((note) => !!note) as CombatNote[]
+    .filter((result) => !!result.note)
+    .map((a) => a.note) as CombatNote[]
 
   return notes
 }

@@ -5,7 +5,10 @@ export function mapNoteToJournalEntryData(note: CombatNote): JournalEntryData {
   return { type: note.type, uuid: note.uuid }
 }
 
-export function getNoteFromJournalEntryData(data: JournalEntryData | null): { error?: string; note?: CombatNote } {
+export async function getNoteFromJournalEntryData(data: JournalEntryData | null): Promise<{
+  error?: string
+  note?: CombatNote
+}> {
   if (data === null || data.uuid === undefined) {
     // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
     return {}
@@ -18,35 +21,31 @@ export function getNoteFromJournalEntryData(data: JournalEntryData | null): { er
     return {}
   }
 
-  const [, id] = uuid.split('.')
+  const doc = await fromUuid(uuid)
 
-  const g = game as Game
-  const entry = g.journal?.get(id)
-
-  if (!entry) {
+  if (!doc) {
     return { error: ERROR.UnknownJournalEntry }
   }
 
-  const name = entry?.name ?? ''
+  const name = doc?.name ?? ''
 
   if (!name) {
     return { error: ERROR.MissingJournalEntryName }
   }
 
-  return { note: { uuid, id, type, name } }
+  return { note: { uuid, type, name } }
 }
 
-export function mapNoteToJournalEntry(note: CombatNote): {
-  id: string
+export async function mapNoteToJournalEntry(note: CombatNote): Promise<{
+  uuid: string
   error?: string
   entry?: JournalEntry
-} {
-  const g = game as Game
-  const entry = g.journal?.get(note.id)
+}> {
+  const doc = (await fromUuid(note.uuid)) as JournalEntry | null
 
-  if (!entry) {
-    return { id: note.id, error: ERROR.UnknownJournalEntryId }
+  if (!doc) {
+    return { uuid: note.uuid, error: ERROR.UnknownJournalEntryId }
   }
 
-  return { id: note.id, entry }
+  return { uuid: note.uuid, entry: doc }
 }
