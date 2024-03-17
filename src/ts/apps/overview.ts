@@ -1,4 +1,4 @@
-import { JOURNAL_ENTRY_TYPE, MODULE_ID } from '../constants'
+import { MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
 import { CombatNote, JournalEntryData } from '../models/note'
 import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
@@ -42,6 +42,8 @@ export default class AcnOverview extends Application {
     if (!this.notes.length) {
       this.notes = await loadNotes()
     }
+
+    console.debug(100, this.notes)
 
     return {
       notes: [...this.notes],
@@ -106,7 +108,7 @@ export default class AcnOverview extends Application {
       return
     }
 
-    if (data.type !== JOURNAL_ENTRY_TYPE) {
+    if (!VALID_DOCUMENT_TYPES.includes(data.type)) {
       return
     }
 

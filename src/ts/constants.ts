@@ -1,8 +1,8 @@
 import { id } from '../module.json'
 
 export const MODULE_ID = id
-export const JOURNAL_ENTRY_TYPE = 'JournalEntry'
 export const COMBAT_NOTE_STORAGE_TYPE = 'CombatNotes'
+export const VALID_DOCUMENT_TYPES = ['JournalEntry', 'JournalEntryPage']
 
 export enum ERROR {
   MissingUser = 'ACN.error.missingUser',

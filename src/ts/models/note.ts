@@ -11,6 +11,10 @@ export type CombatNote = {
    * Journal entry name
    */
   name: string
+  /**
+   * FVTT anchor element HTML to reference the note
+   */
+  anchor: string
 }
 
 export type JournalEntryData = {

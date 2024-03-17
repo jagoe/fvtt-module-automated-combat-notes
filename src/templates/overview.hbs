@@ -18,14 +18,7 @@
         {{#each this.notes}}
           <tr>
             <td>
-              <a
-                class='content-link'
-                draggable='true'
-                data-uuid='{{this.uuid}}'
-                data-id='{{this.id}}'
-                data-type='{{this.type}}'
-                data-tooltip='Journal Entry'
-              ><i class='fas fa-book-open'></i>{{this.name}}</a>
+              {{{this.anchor}}}
             </td>
             <td class='actions'>
               <a class='delete-note' data-uuid='{{this.uuid}}' data-index='{{@index}}' title='Delete Note'><i
