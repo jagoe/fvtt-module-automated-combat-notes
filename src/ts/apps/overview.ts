@@ -1,4 +1,5 @@
-import { MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
+import { ERROR, MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
+import { FREQUENCY_OPTIONS, Frequency } from '../models/frequencies'
 import { CombatNote, JournalEntryData } from '../models/note'
 import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
@@ -45,6 +46,7 @@ export default class AcnOverview extends Application {
 
     return {
       notes: [...this.notes],
+      frequencyOptions: FREQUENCY_OPTIONS,
     }
   }
 
@@ -58,6 +60,7 @@ export default class AcnOverview extends Application {
     dropTargets.on('drop', this.handleDrop.bind(this))
 
     html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
+    html.find('.note-frequency').on('change', this.handleChangeFrequency.bind(this))
   }
 
   public appendDisplayButton(element: JQuery<HTMLElement>): void {
@@ -110,6 +113,10 @@ export default class AcnOverview extends Application {
       return
     }
 
+    if (this.notes.some((note) => note.uuid === data.uuid)) {
+      return
+    }
+
     const target = event.currentTarget as HTMLElement
     target.classList.add('drag-over')
     event.preventDefault()
@@ -122,6 +129,16 @@ export default class AcnOverview extends Application {
     target.classList.remove('drag-over')
 
     const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+
+    if (data === null || data.uuid === undefined) {
+      // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
+      return
+    }
+
+    if (this.notes.some((note) => note.uuid === data.uuid)) {
+      ui.notifications?.warn(ERROR.DuplicateJournalEntry, { localize: true })
+      return
+    }
 
     const { note, error } = await getNoteFromJournalEntryData(data)
 
@@ -152,15 +169,34 @@ export default class AcnOverview extends Application {
     event.preventDefault()
 
     const button = event.currentTarget as HTMLElement
-    const { uuid, index } = button.dataset
+    const { uuid } = button.dataset
 
     if (!uuid) {
       return
     }
 
-    this.notes = this.notes.filter((note, i) => note.uuid !== uuid || i !== Number(index))
+    this.notes = this.notes.filter((note) => note.uuid !== uuid)
     saveNotes(this.notes)
 
     this.render()
+  }
+
+  private handleChangeFrequency(event: JQuery.ChangeEvent) {
+    const select = event.currentTarget as HTMLSelectElement
+    const { uuid } = select.dataset
+
+    if (!uuid) {
+      return
+    }
+
+    const note = this.notes.find((n) => n.uuid === uuid)
+
+    if (!note) {
+      return
+    }
+
+    note.frequency = select.value as Frequency
+
+    saveNotes([...this.notes])
   }
 }

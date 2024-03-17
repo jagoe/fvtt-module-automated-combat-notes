@@ -9,6 +9,7 @@ export enum ERROR {
   MissingJournalEntryName = 'ACN.error.missingJournalEntryName',
   UnknownJournalEntry = 'ACN.error.unknownJournalEntry',
   UnknownJournalEntryId = 'ACN.error.unknownJournalEntryId',
+  DuplicateJournalEntry = 'ACN.error.duplicateJournalEntry',
 }
 
 export enum MODULE_EVENT {

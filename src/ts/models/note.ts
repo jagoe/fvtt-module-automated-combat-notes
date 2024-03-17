@@ -1,20 +1,21 @@
+import { Frequency } from './frequencies'
+
 export type CombatNote = {
   /**
    * Foundry app UUID
    */
   uuid: string
+
   /**
    * Foundry app type
    */
   type: string
+
   /**
    * Journal entry name
    */
   name: string
-  /**
-   * FVTT anchor element HTML to reference the note
-   */
-  anchorElement: string
+
   /**
    * Optional anchor for headings in the note
    */
@@ -23,11 +24,22 @@ export type CombatNote = {
      * Anchor name
      */
     name: string
+
     /**
      * Anchor slug
      */
     slug?: string
   }
+
+  /**
+   * Frequency of the note
+   */
+  frequency: Frequency
+
+  /**
+   * FVTT anchor element HTML to reference the note
+   */
+  anchorElement: string
 }
 
 export type JournalEntryData = {
@@ -35,10 +47,12 @@ export type JournalEntryData = {
    * Foundry app UUID
    */
   uuid: string
+
   /**
    * Foundry app type
    */
   type: string
+
   /**
    * Container holding information about the anchor to be navigated to
    */
@@ -47,9 +61,15 @@ export type JournalEntryData = {
      * Anchor name
      */
     name: string
+
     /**
      * Anchor slug
      */
     slug?: string
   }
+
+  /**
+   * Frequency of the note
+   */
+  frequency: Frequency
 }

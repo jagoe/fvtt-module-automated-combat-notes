@@ -10,8 +10,9 @@
     <table>
       <thead>
         <tr>
-          <th>{{localize 'ACN.table.journalEntry'}}</th>
-          <th></th>
+          <th>{{localize 'ACN.overview.table.journalEntry'}}</th>
+          <th>{{localize 'ACN.overview.table.frequency'}}</th>
+          <th>{{localize 'ACN.overview.table.actions'}}</th>
         </tr>
       </thead>
       <tbody>
@@ -20,8 +21,13 @@
             <td>
               {{{this.anchorElement}}}
             </td>
-            <td class='actions'>
-              <a class='delete-note' data-uuid='{{this.uuid}}' data-index='{{@index}}' title='Delete Note'><i
+            <td class="text-center">
+              <select class="note-frequency" name="frequency" data-uuid="{{this.uuid}}">
+                {{selectOptions ../frequencyOptions selected=this.frequency localize=true}}
+              </select>
+            </td>
+            <td class='text-center'>
+              <a class='delete-note' data-uuid='{{this.uuid}}' title='Delete Note'><i
                   class='fas fa-trash-alt'
                 ></i></a>
             </td>
@@ -40,3 +46,8 @@
     </div>
   {{/if}}
 </section>
+
+{{!
+TODO:
+* Display input for N
+}}
