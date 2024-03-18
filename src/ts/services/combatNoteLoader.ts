@@ -1,3 +1,4 @@
+import { MODULE_HOOKS } from '../constants'
 import { CombatNote } from '../models'
 import { Frequency } from '../models/frequencies'
 import { AnyDocument } from '../types'
@@ -19,8 +20,8 @@ export class CombatNoteLoader {
       .map((result) => ({ document: result.document, note: result.note }))
       .forEach(({ note, document }) => this.renderNote(note, document))
 
-    saveNotes([...notes])
-    // TODO: Trigger a hook to update the UI
+    await saveNotes([...notes])
+    Hooks.call(MODULE_HOOKS.UpdateNotes)
   }
 
   private renderNote(note: CombatNote, document?: AnyDocument) {
@@ -30,7 +31,7 @@ export class CombatNoteLoader {
 
     const documentName = document.documentName as string | null | undefined
 
-    this.countDown(note)
+    this.countUp(note)
 
     if (!this.shouldBeDisplayed(note)) {
       return
@@ -61,10 +62,9 @@ export class CombatNoteLoader {
     return entry.sheet?.render(true, renderOptions)
   }
 
-  private countDown(note: CombatNote) {
-    if (note.frequency === Frequency.EveryNth || note.frequency === Frequency.OnceAfterN) {
-      // TODO: Count down
-      // TODO: Store counter & original value
+  private countUp(note: CombatNote) {
+    if (note.frequency === Frequency.EveryNth || note.frequency === Frequency.OnceNth) {
+      note.frequencyCounter = (note.frequencyCounter ?? 0) + 1
     }
   }
 
@@ -77,9 +77,8 @@ export class CombatNoteLoader {
       return false
     }
 
-    if (note.frequency === Frequency.EveryNth || note.frequency === Frequency.OnceAfterN) {
-      // TODO: Depends on counter
-      return false
+    if (note.frequency === Frequency.EveryNth || note.frequency === Frequency.OnceNth) {
+      return note.frequencyCounter === note.frequencyInterval
     }
 
     return false
@@ -91,11 +90,11 @@ export class CombatNoteLoader {
     }
 
     if (note.frequency === Frequency.EveryNth) {
-      // TODO: Reset to original N
+      note.frequencyCounter = 0
       return
     }
 
-    if (note.frequency === Frequency.Once || note.frequency === Frequency.OnceAfterN) {
+    if (note.frequency === Frequency.Once || note.frequency === Frequency.OnceNth) {
       note.frequency = Frequency.Never
     }
   }

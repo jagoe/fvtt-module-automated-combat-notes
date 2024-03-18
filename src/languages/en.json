@@ -22,8 +22,8 @@
     "frequencies": {
       "always": "Always",
       "once": "Once",
-      "onceAfterN": "Once after N",
-      "everyNth": "Every Nth",
+      "onceNth": "Once in the Nth combat",
+      "everyNth": "Every Nth combat",
       "never": "Never"
     },
     "error": {

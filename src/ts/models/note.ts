@@ -1,48 +1,6 @@
 import { Frequency } from './frequencies'
 
-export type CombatNote = {
-  /**
-   * Foundry app UUID
-   */
-  uuid: string
-
-  /**
-   * Foundry app type
-   */
-  type: string
-
-  /**
-   * Journal entry name
-   */
-  name: string
-
-  /**
-   * Optional anchor for headings in the note
-   */
-  anchor?: {
-    /**
-     * Anchor name
-     */
-    name: string
-
-    /**
-     * Anchor slug
-     */
-    slug?: string
-  }
-
-  /**
-   * Frequency of the note
-   */
-  frequency: Frequency
-
-  /**
-   * FVTT anchor element HTML to reference the note
-   */
-  anchorElement: string
-}
-
-export type JournalEntryData = {
+export type DocumentDragDropData = {
   /**
    * Foundry app UUID
    */
@@ -67,9 +25,33 @@ export type JournalEntryData = {
      */
     slug?: string
   }
+}
 
+export type CombatNoteData = DocumentDragDropData & {
   /**
    * Frequency of the note
    */
   frequency: Frequency
+
+  /**
+   * Frequency interval of the note (i.e. every N combats or once in the Nth combat)
+   */
+  frequencyInterval?: number
+
+  /**
+   * Frequency counter for the note
+   */
+  frequencyCounter?: number
+}
+
+export type CombatNote = CombatNoteData & {
+  /**
+   * Journal entry name
+   */
+  name: string
+
+  /**
+   * FVTT anchor element HTML to reference the note
+   */
+  anchorElement: string
 }

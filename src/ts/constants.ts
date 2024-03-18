@@ -15,3 +15,7 @@ export enum ERROR {
 export enum MODULE_EVENT {
   DisplayNotes = 'DisplayNotes',
 }
+
+export enum MODULE_HOOKS {
+  UpdateNotes = 'ACN.UpdateNotes',
+}
