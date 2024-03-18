@@ -86,11 +86,6 @@ export default class AcnOverview extends Application {
     Hooks.on(MODULE_HOOKS.UpdateNotes, this.handleNotesUpdate.bind(this))
   }
 
-  private deRegisterNoteHooks(): void {
-    Hooks.off('updateJournalEntry', this.handleJournalEntryUpdate.bind(this))
-    Hooks.off(MODULE_HOOKS.UpdateNotes, this.handleNotesUpdate.bind(this))
-  }
-
   private handleDragOver(event: JQuery.DragOverEvent) {
     const data: CombatNoteData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
 
