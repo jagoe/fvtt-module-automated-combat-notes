@@ -1,6 +1,7 @@
-import { MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
-import { CombatNote, JournalEntryData } from '../models/note'
-import { getNoteFromJournalEntryData } from '../services/combatNoteMapper'
+import { ERROR, MODULE_HOOKS, MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
+import { FREQUENCY_OPTIONS, Frequency } from '../models/frequencies'
+import { CombatNote, CombatNoteData } from '../models/note'
+import { getNoteFromDragDropData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
 
 export default class AcnOverview extends Application {
@@ -36,6 +37,7 @@ export default class AcnOverview extends Application {
     super()
 
     this.registerNoteHooks()
+    Handlebars.registerHelper('isFrequencyWithInterval', this.isFrequencyWithInterval.bind(this))
   }
 
   override async getData() {
@@ -45,6 +47,7 @@ export default class AcnOverview extends Application {
 
     return {
       notes: [...this.notes],
+      frequencyOptions: FREQUENCY_OPTIONS,
     }
   }
 
@@ -58,6 +61,8 @@ export default class AcnOverview extends Application {
     dropTargets.on('drop', this.handleDrop.bind(this))
 
     html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
+    html.find('[name=frequency]').on('change', this.handleChangeFrequency.bind(this))
+    html.find('[name=frequency-interval]').on('change', this.handleChangeFrequencyInterval.bind(this))
   }
 
   public appendDisplayButton(element: JQuery<HTMLElement>): void {
@@ -77,36 +82,27 @@ export default class AcnOverview extends Application {
   }
 
   private registerNoteHooks(): void {
-    Hooks.on('updateJournalEntry', (journal: JournalEntry): void => {
-      const notes = this.notes.filter((n) => n.uuid === journal.uuid)
+    Hooks.on('updateJournalEntry', this.handleJournalEntryUpdate.bind(this))
+    Hooks.on(MODULE_HOOKS.UpdateNotes, this.handleNotesUpdate.bind(this))
+  }
 
-      if (!notes.length) {
-        return
-      }
-
-      const { name } = journal
-
-      notes.forEach((note) => {
-        if (name === note.name || name === null) {
-          return
-        }
-
-        note.name = name
-      })
-
-      // No need to persist, because the name will get fetched when loading anyway
-      this.render()
-    })
+  private deRegisterNoteHooks(): void {
+    Hooks.off('updateJournalEntry', this.handleJournalEntryUpdate.bind(this))
+    Hooks.off(MODULE_HOOKS.UpdateNotes, this.handleNotesUpdate.bind(this))
   }
 
   private handleDragOver(event: JQuery.DragOverEvent) {
-    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+    const data: CombatNoteData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
 
     if (data === null || data.uuid === undefined) {
       return
     }
 
     if (!VALID_DOCUMENT_TYPES.includes(data.type)) {
+      return
+    }
+
+    if (this.notes.some((note) => note.uuid === data.uuid)) {
       return
     }
 
@@ -121,9 +117,19 @@ export default class AcnOverview extends Application {
     const target = event.currentTarget as HTMLElement
     target.classList.remove('drag-over')
 
-    const data: JournalEntryData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+    const data: CombatNoteData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
 
-    const { note, error } = await getNoteFromJournalEntryData(data)
+    if (data === null || data.uuid === undefined) {
+      // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
+      return
+    }
+
+    if (this.notes.some((note) => note.uuid === data.uuid)) {
+      ui.notifications?.warn(ERROR.DuplicateJournalEntry, { localize: true })
+      return
+    }
+
+    const { note, error } = await getNoteFromDragDropData(data)
 
     if (error) {
       ui.notifications?.error(error, { localize: true, permanent: true })
@@ -136,7 +142,7 @@ export default class AcnOverview extends Application {
     }
 
     this.notes = [...this.notes, note]
-    saveNotes(this.notes)
+    await saveNotes(this.notes)
 
     this.render()
   }
@@ -148,19 +154,92 @@ export default class AcnOverview extends Application {
     target.classList.remove('drag-over')
   }
 
-  private handleRemoveNote(event: JQuery.ClickEvent) {
+  private async handleRemoveNote(event: JQuery.ClickEvent) {
     event.preventDefault()
 
     const button = event.currentTarget as HTMLElement
-    const { uuid, index } = button.dataset
+    const { uuid } = button.dataset
 
     if (!uuid) {
       return
     }
 
-    this.notes = this.notes.filter((note, i) => note.uuid !== uuid || i !== Number(index))
-    saveNotes(this.notes)
+    this.notes = this.notes.filter((note) => note.uuid !== uuid)
+    await saveNotes(this.notes)
 
     this.render()
+  }
+
+  private async handleChangeFrequency(event: JQuery.ChangeEvent) {
+    const select = event.currentTarget as HTMLSelectElement
+    const { uuid } = select.dataset
+
+    if (!uuid) {
+      return
+    }
+
+    const note = this.notes.find((n) => n.uuid === uuid)
+
+    if (!note) {
+      return
+    }
+
+    note.frequency = select.value as Frequency
+
+    await saveNotes([...this.notes])
+    this.render(false, { renderData: this.getData() })
+  }
+
+  private async handleChangeFrequencyInterval(event: JQuery.ChangeEvent) {
+    const input = event.currentTarget as HTMLInputElement
+    const { uuid } = input.dataset
+
+    if (!uuid) {
+      return
+    }
+
+    const note = this.notes.find((n) => n.uuid === uuid)
+
+    if (!note) {
+      return
+    }
+
+    const interval = Number.isNumeric(input.value) ? parseInt(input.value, 10) : 0
+    note.frequencyInterval = interval < 0 ? 0 : interval
+    note.frequencyCounter = 0
+
+    await saveNotes([...this.notes])
+    this.render(false, { renderData: this.getData() })
+  }
+
+  private handleJournalEntryUpdate(journal: JournalEntry): void {
+    const notes = this.notes.filter((n) => n.uuid === journal.uuid)
+
+    if (!notes.length) {
+      return
+    }
+
+    const { name } = journal
+
+    notes.forEach((note) => {
+      if (name === note.name || name === null) {
+        return
+      }
+
+      note.name = name
+    })
+
+    // No need to persist, because the name will get fetched when loading anyway
+    this.render()
+  }
+
+  private async handleNotesUpdate(): Promise<void> {
+    this.notes = await loadNotes()
+    console.debug(200, { notes: this.notes })
+    this.render(false, { renderData: this.getData() })
+  }
+
+  private isFrequencyWithInterval(frequency: Frequency): boolean {
+    return frequency === Frequency.EveryNth || frequency === Frequency.OnceNth
   }
 }

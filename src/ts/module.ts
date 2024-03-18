@@ -33,7 +33,7 @@ Hooks.once('init', () => {
   })
 
   module.events.on(MODULE_EVENT.DisplayNotes, () => {
-    module.loader.displayNotes()
+    displayNotes()
   })
 })
 
@@ -43,5 +43,9 @@ Hooks.on('renderCombatTracker', (_: Application, html: JQuery) => {
 
 Hooks.on(DisplayEvent.CombatStart, () => {
   module.events.emit(MODULE_EVENT.DisplayNotes)
-  module.loader.displayNotes()
+  displayNotes()
 })
+
+function displayNotes() {
+  module.loader.displayNotes()
+}

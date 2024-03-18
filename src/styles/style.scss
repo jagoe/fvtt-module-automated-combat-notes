@@ -11,9 +11,26 @@
 .window-app .window-content section.acn-notes {
   flex: 100;
 
-  .actions {
+  td.text-center {
     text-align: center;
-    width: 2em;
+  }
+
+  .frequency {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 180px;
+
+    .frequency-interval {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+      line-height: 1.8;
+
+      input {
+        text-align: left;
+      }
+    }
   }
 
   .notes-drop-target {
