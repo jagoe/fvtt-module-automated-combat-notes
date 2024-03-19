@@ -7,9 +7,12 @@
   "scripts": {
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
+    "build:tests": "tsc && vite --mode testing build",
+    "watch:tests": "tsc && vite --mode testing build --watch",
     "lint": "eslint --ext .ts ."
   },
   "devDependencies": {
+    "@ethaks/fvtt-quench": "^0.9.2",
     "@league-of-foundry-developers/foundry-vtt-types": "^9.280.0",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
