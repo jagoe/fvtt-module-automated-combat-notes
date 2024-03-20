@@ -1,18 +1,18 @@
 <section>
-  <header class='flex-header'>
-    <h1 class='grow-header'>
-      {{localize 'ACN.overview.title'}}
+  <header class="flex-header">
+    <h1 class="grow-header">
+      {{localize "ACN.overview.title"}}
     </h1>
   </header>
 </section>
-<section class='acn-notes'>
+<section class="acn-notes">
   {{#if this.notes.length}}
   <table>
     <thead>
       <tr>
-        <th>{{localize 'ACN.overview.table.journalEntry'}}</th>
-        <th>{{localize 'ACN.overview.table.frequency'}}</th>
-        <th>{{localize 'ACN.overview.table.actions'}}</th>
+        <th>{{localize "ACN.overview.table.journalEntry"}}</th>
+        <th>{{localize "ACN.overview.table.frequency"}}</th>
+        <th>{{localize "ACN.overview.table.actions"}}</th>
       </tr>
     </thead>
     <tbody>
@@ -21,7 +21,7 @@
         <td>
           {{{this.anchorElement}}}
         </td>
-        <td class="text-center">
+        <td class="frequency-column text-center">
           <div class="frequency">
             <select name="frequency" data-uuid="{{this.uuid}}">
               {{selectOptions ../frequencyOptions selected=this.frequency localize=true}}
@@ -38,21 +38,21 @@
             {{/if}}
           </div>
         </td>
-        <td class='text-center'>
-          <a class='delete-note' data-uuid='{{this.uuid}}' title='Delete Note'><i class='fas fa-trash-alt'></i></a>
+        <td class="actions-column text-center">
+          <a class="delete-note" data-uuid="{{this.uuid}}" title="Delete Note"><i class="fas fa-trash-alt"></i></a>
         </td>
       </tr>
       {{/each}}
     </tbody>
   </table>
-  <div class='notes-drop-target'>
-    <span class='text'>{{localize 'ACN.overview.drop-target.text'}}</span>
-    <i class='fas fa-plus'></i>
+  <div class="notes-drop-target">
+    <span class="text">{{localize "ACN.overview.drop-target.text"}}</span>
+    <i class="fas fa-plus"></i>
   </div>
   {{else}}
-  <div class='notes-drop-target'>
-    <span class='text'>{{localize 'ACN.overview.drop-target.textEmpty'}}</span>
-    <i class='fas fa-plus'></i>
+  <div class="notes-drop-target">
+    <span class="text">{{localize "ACN.overview.drop-target.textEmpty"}}</span>
+    <i class="fas fa-plus"></i>
   </div>
   {{/if}}
 </section>
