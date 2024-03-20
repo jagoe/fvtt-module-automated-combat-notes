@@ -2,7 +2,7 @@
 // code and not include them in the build output.
 import '../styles/style.scss'
 import AcnOverview from './apps/overview'
-import { MODULE_EVENT, MODULE_ID } from './constants'
+import { KEYBINDING, MODULE_EVENT, MODULE_ID } from './constants'
 import { CombatNoteLoader } from './services/combatNoteLoader'
 import { ModuleEvents } from './services/moduleEvents'
 import { ACN, DisplayEvent } from './types'
@@ -12,13 +12,13 @@ let module: ACN
 Hooks.once('init', () => {
   console.log(`Initializing ${MODULE_ID}`)
 
-  let g = game as Game
-  module = g.modules.get(MODULE_ID) as ACN
+  const _game = game as Game
+  module = _game.modules.get(MODULE_ID) as ACN
   module.overview = new AcnOverview()
   module.loader = new CombatNoteLoader()
   module.events = new ModuleEvents()
 
-  g.keybindings.register(MODULE_ID, 'show-acn-overview', {
+  _game.keybindings.register(MODULE_ID, KEYBINDING.ShowOverview, {
     name: 'ACN.overview.open.keybinding.label',
     hint: 'ACN.overview.open.keybinding.hint',
     editable: [

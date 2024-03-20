@@ -19,3 +19,7 @@ export enum MODULE_EVENT {
 export enum MODULE_HOOKS {
   UpdateNotes = 'ACN.UpdateNotes',
 }
+
+export enum KEYBINDING {
+  ShowOverview = 'show-acn-overview',
+}

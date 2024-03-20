@@ -3,20 +3,20 @@ import { CombatNote, CombatNoteData } from '../models'
 import { getNoteFromStorageData, mapNoteToJournalEntryData } from './combatNoteMapper'
 
 export async function saveNotes(notes: CombatNote[]) {
-  const g = game as Game
+  const _game = game as Game
 
-  if (!g.user) {
+  if (!_game.user) {
     ui.notifications?.error(ERROR.MissingUser, { localize: true, permanent: true })
     return
   }
 
-  await g.user.setFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE, notes.map(mapNoteToJournalEntryData))
+  await _game.user.setFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE, notes.map(mapNoteToJournalEntryData))
 }
 
 export async function loadNotes(): Promise<CombatNote[]> {
-  const g = game as Game
+  const _game = game as Game
 
-  const storedNoteData = (g.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as CombatNoteData[]) ?? []
+  const storedNoteData = (_game.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as CombatNoteData[]) ?? []
   const noteResults = await Promise.all(
     storedNoteData.map(async (data) => ({ ...(await getNoteFromStorageData(data)), data })),
   )
