@@ -19,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
     "chai": "^5.1.0",
+    "chai-wait-for": "^1.1.0",
     "eslint": "^8.57.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-scss": "^4.0.0",
