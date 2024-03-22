@@ -59,13 +59,80 @@ Hooks.on('quenchReady', (quench) => {
           expect(displayButton).to.exist
         })
 
-        it('should register the combat start event listener', () => {
-          // Arrange
-          const allEvents: Record<string, []> = (Hooks as any).events
-          const displayNoteEvents = allEvents[FOUNDRY_EVENT.CombatStart]
+        describe('Hooks', () => {
+          const module = _game.modules.get(MODULE_ID) as ACN
+          const displayNotesSpy = sinon.spy()
+          let loaderStub: sinon.SinonStub
 
-          // Assert
-          expect(displayNoteEvents).to.have.length.greaterThanOrEqual(1)
+          before(() => {
+            loaderStub = sinon.stub(module.loader, 'displayNotes').callsFake(displayNotesSpy)
+          })
+
+          afterEach(() => {
+            displayNotesSpy.resetHistory()
+          })
+
+          after(() => {
+            loaderStub.reset()
+          })
+
+          it('should register the combat start hook', () => {
+            // Arrange
+            const allEvents: Record<string, []> = (Hooks as any).events
+            const combatStartEvent = allEvents[FOUNDRY_EVENT.CombatStart]
+
+            // Assert
+            expect(combatStartEvent).to.have.length.greaterThanOrEqual(1)
+          })
+
+          it('should register the combat round hook', () => {
+            // Arrange
+            const allEvents: Record<string, []> = (Hooks as any).events
+            const combatTurnEvents = allEvents[FOUNDRY_EVENT.CombatRound]
+
+            // Assert
+            expect(combatTurnEvents).to.have.length.greaterThanOrEqual(1)
+          })
+
+          it('should call the display notes method when the combat starts', () => {
+            // Act
+            Hooks.call(FOUNDRY_EVENT.CombatStart)
+
+            // Assert
+            expect(displayNotesSpy.called).to.be.true
+          })
+
+          it('should call the display notes method when the combat starts by advancing to the initial round', () => {
+            // Arrange
+            const combat = new Combat()
+            const updateData = { round: 1, turn: null }
+            const updateOptions = { advanceTime: 6, direction: 1 }
+
+            // Act
+            Hooks.call(FOUNDRY_EVENT.CombatRound, combat, updateData, updateOptions)
+
+            // Assert
+            expect(displayNotesSpy.called).to.be.true
+          })
+
+          const noCombatStarts = [
+            { round: 2, turn: null },
+            { round: 1, turn: 1 },
+            { round: 2, turn: 1 },
+          ]
+          noCombatStarts.forEach((updateData) => {
+            it(`should not call the display notes method when advancing to any but the initial round (${updateData})`, () => {
+              // Arrange
+              const combat = new Combat()
+              const updateOptions = { advanceTime: 6, direction: 1 }
+
+              // Act
+              Hooks.call(FOUNDRY_EVENT.CombatRound, combat, updateData, updateOptions)
+
+              // Assert
+              expect(displayNotesSpy.called).to.be.false
+            })
+          })
         })
 
         it('should register the module socket event listener', () => {
