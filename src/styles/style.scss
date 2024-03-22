@@ -15,22 +15,30 @@
     text-align: center;
   }
 
-  .frequency {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  td.frequency-column {
     width: 180px;
 
-    .frequency-interval {
+    .frequency {
       display: flex;
-      flex-direction: row;
-      gap: 5px;
-      line-height: 1.8;
+      flex-direction: column;
+      gap: 2px;
+      width: 180px;
 
-      input {
-        text-align: left;
+      .frequency-interval {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        line-height: 1.8;
+
+        input {
+          text-align: left;
+        }
       }
     }
+  }
+
+  td.actions-column {
+    width: 80px;
   }
 
   .notes-drop-target {
