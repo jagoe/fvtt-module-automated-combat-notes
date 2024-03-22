@@ -46,6 +46,20 @@ Hooks.on(DisplayEvent.CombatStart, () => {
   displayNotes()
 })
 
+Hooks.on(
+  DisplayEvent.CombatRound,
+  (
+    _combat: Combat,
+    updateData: { round: number; turn: number | null },
+    _updateOptions: { advanceTime: number; direction: number },
+  ): void => {
+    if (updateData.round === 1 && updateData.turn === null) {
+      module.events.emit(MODULE_EVENT.DisplayNotes)
+      displayNotes()
+    }
+  },
+)
+
 function displayNotes() {
   module.loader.displayNotes()
 }
