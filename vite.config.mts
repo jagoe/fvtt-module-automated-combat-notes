@@ -1,7 +1,9 @@
+import fs from 'fs'
+import path from 'path'
 import * as fsPromises from 'fs/promises'
 import copy from 'rollup-plugin-copy'
 import scss from 'rollup-plugin-scss'
-import { defineConfig, Plugin } from 'vite'
+import { createLogger, defineConfig, Plugin } from 'vite'
 
 const moduleVersion = process.env.MODULE_VERSION
 const githubProject = process.env.GH_PROJECT
@@ -28,6 +30,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      customTsConfig({
+        filename: `tsconfig.${mode}.json`,
+      }),
       updateModuleManifestPlugin({ mode }),
       scss({
         fileName: 'style.css',
@@ -92,6 +97,49 @@ function updateModuleManifestPlugin({ mode }: { mode: string }): Plugin {
       }
 
       await fsPromises.writeFile('dist/module.json', JSON.stringify(manifestJson, null, 4))
+    },
+  }
+}
+
+function customTsConfig({ filename }: { filename: string }): Plugin {
+  const originalFilePath = 'tsconfig.json'
+  const temporaryFilePath = `${originalFilePath}.bak`
+  const log = createLogger('warn', { prefix: '[customTsConfig]' })
+
+  return {
+    name: 'custom-tsconfig',
+    async buildStart() {
+      const root = process.cwd()
+      const tsConfigPath = path.resolve(root, originalFilePath)
+      const backupPath = path.resolve(root, temporaryFilePath)
+
+      if (fs.existsSync(backupPath)) {
+        await fsPromises.rm(backupPath)
+      }
+
+      await fsPromises.rename(tsConfigPath, backupPath)
+
+      const providedTsConfigPath = path.resolve(root, filename)
+      await fsPromises.copyFile(providedTsConfigPath, tsConfigPath)
+    },
+    async closeBundle() {
+      const root = process.cwd()
+      const tsConfigPath = path.resolve(root, originalFilePath)
+
+      if (!fs.existsSync(tsConfigPath)) {
+        return
+      }
+
+      await fsPromises.rm(tsConfigPath)
+
+      const backupPath = path.resolve(root, temporaryFilePath)
+
+      if (!fs.existsSync(backupPath)) {
+        log.error(`Backup file ${backupPath} does not exist.`)
+        return
+      }
+
+      await fsPromises.rename(backupPath, tsConfigPath)
     },
   }
 }

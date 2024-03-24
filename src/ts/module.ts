@@ -2,21 +2,21 @@
 // code and not include them in the build output.
 import '../styles/style.scss'
 import AcnOverview from './apps/overview'
-import { KEYBINDING, MODULE_EVENT, MODULE_ID } from './constants'
+import { FOUNDRY_EVENT, KEYBINDING, MODULE_EVENT, MODULE_ID, MODULE_NAME } from './constants'
 import { CombatNoteLoader } from './services/combatNoteLoader'
-import { ModuleEvents } from './services/moduleEvents'
-import { ACN, DisplayEvent } from './types'
+import { ModuleEvents as ModuleSocket } from './services/moduleSocket'
+import { ACN } from './types'
 
 let module: ACN
 
 Hooks.once('init', () => {
-  console.log(`Initializing ${MODULE_ID}`)
+  console.log(`${MODULE_NAME} | Initializing`)
 
   const _game = game as Game
   module = _game.modules.get(MODULE_ID) as ACN
   module.overview = new AcnOverview()
   module.loader = new CombatNoteLoader()
-  module.events = new ModuleEvents()
+  module.socket = new ModuleSocket()
 
   _game.keybindings.register(MODULE_ID, KEYBINDING.ShowOverview, {
     name: 'ACN.overview.open.keybinding.label',
@@ -32,7 +32,7 @@ Hooks.once('init', () => {
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
   })
 
-  module.events.on(MODULE_EVENT.DisplayNotes, () => {
+  module.socket.on(MODULE_EVENT.DisplayNotes, () => {
     displayNotes()
   })
 })
@@ -41,20 +41,20 @@ Hooks.on('renderCombatTracker', (_: Application, html: JQuery) => {
   module.overview.appendDisplayButton(html.find('.combat-tracker-header .encounter-controls'))
 })
 
-Hooks.on(DisplayEvent.CombatStart, () => {
-  module.events.emit(MODULE_EVENT.DisplayNotes)
+Hooks.on(FOUNDRY_EVENT.CombatStart, () => {
+  module.socket.emit(MODULE_EVENT.DisplayNotes)
   displayNotes()
 })
 
 Hooks.on(
-  DisplayEvent.CombatRound,
+  FOUNDRY_EVENT.CombatRound,
   (
     _combat: Combat,
     updateData: { round: number; turn: number | null },
     _updateOptions: { advanceTime: number; direction: number },
   ): void => {
     if (updateData.round === 1 && updateData.turn === null) {
-      module.events.emit(MODULE_EVENT.DisplayNotes)
+      module.socket.emit(MODULE_EVENT.DisplayNotes)
       displayNotes()
     }
   },
