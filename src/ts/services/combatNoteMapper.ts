@@ -2,17 +2,6 @@ import { ERROR, VALID_DOCUMENT_TYPES } from '../constants'
 import { CombatNote, CombatNoteData, DocumentDragDropData } from '../models'
 import { Frequency } from '../models/frequencies'
 
-export function mapNoteToJournalEntryData(note: CombatNote): CombatNoteData {
-  return {
-    type: note.type,
-    uuid: note.uuid,
-    anchor: note.anchor,
-    frequency: note.frequency,
-    frequencyInterval: note.frequencyInterval,
-    frequencyCounter: note.frequencyCounter,
-  }
-}
-
 export async function getNoteFromDragDropData(data: DocumentDragDropData): Promise<{
   error?: string
   note?: CombatNote
