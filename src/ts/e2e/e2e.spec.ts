@@ -1,9 +1,9 @@
-import { COMBAT_NOTE_STORAGE_TYPE, KEYBINDING, MODULE_ID, MODULE_NAME } from '../constants'
+import { KEYBINDING, MODULE_ID, MODULE_NAME } from '../constants'
 import { Frequency } from '../models/frequencies'
-import { getNoteFromStorageData } from '../services/combatNoteMapper'
 import { saveNotes } from '../services/storage'
 import { ACN, CombatNoteData } from '../types'
 import { expectThatEventually } from './helpers/expectToEventually'
+import { loadNoteData } from './helpers/loadNotes'
 import { waitFor } from './helpers/waitFor'
 
 Hooks.on('quenchReady', (quench) => {
@@ -93,8 +93,7 @@ Hooks.on('quenchReady', (quench) => {
         })
 
         afterEach(async () => {
-          await deleteNote(journalEntry.uuid)
-          await deleteNote(journalEntryPage.uuid)
+          await deleteNotesFromUI()
         })
 
         after(async () => {
@@ -176,7 +175,7 @@ Hooks.on('quenchReady', (quench) => {
           const existingEntryCount = getNoteCount()
 
           // Act
-          await deleteNote(journalEntry.uuid)
+          await deleteNoteViaUI(journalEntry.uuid)
 
           // Assert
           await expectThatEventually(() => getNoteCount()).is.equal(existingEntryCount - 1)
@@ -219,7 +218,7 @@ Hooks.on('quenchReady', (quench) => {
         })
 
         afterEach(async () => {
-          await deleteNote(journalEntry.uuid)
+          await deleteNotes()
           await _game.combat?.delete()
         })
 
@@ -282,28 +281,49 @@ Hooks.on('quenchReady', (quench) => {
       }
 
       async function addNote({ type, uuid, anchor, frequency }: CombatNoteData) {
-        const noteResult = await getNoteFromStorageData({
+        const notes = loadNoteData()
+        const noteData: CombatNoteData = {
           type,
           uuid,
           anchor,
           frequency,
           frequencyInterval: 0,
           frequencyCounter: 0,
-        })
-        const combatNote = await noteResult.note!
-        await saveNotes([combatNote])
+        }
+        await saveNotes([...notes, noteData])
 
         await waitFor(async () => {
-          const notes = (_game.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as CombatNoteData[]) ?? []
+          const notes = loadNoteData()
           return notes.some((note) => note.uuid === uuid)
         })
       }
 
-      async function deleteNote(uuid: string) {
+      async function deleteNoteViaUI(uuid: string) {
         const selector = `.acn-notes .delete-note[data-uuid="${uuid}"]`
         const deleteLink = document.querySelector(selector)
-        deleteLink?.dispatchEvent(new MouseEvent('click'))
+        if (!deleteLink) {
+          // Note doesn't exist, nothing to delete
+          return
+        }
+
+        deleteLink.dispatchEvent(new MouseEvent('click'))
         await waitFor(() => !document.querySelector(selector))
+      }
+
+      async function deleteNotesFromUI() {
+        const deleteLinks = document.querySelectorAll('.acn-notes .delete-note')
+        deleteLinks.forEach((link) => link.dispatchEvent(new MouseEvent('click')))
+
+        await waitFor(() => !document.querySelector('.acn-notes .delete-note'))
+      }
+
+      async function deleteNotes() {
+        await saveNotes([])
+
+        await waitFor(async () => {
+          const notes = loadNoteData()
+          return notes.length === 0
+        })
       }
 
       function getNoteCount() {
@@ -318,7 +338,7 @@ Hooks.on('quenchReady', (quench) => {
     },
     {
       displayName: `${MODULE_NAME}: E2E Tests`,
-      preSelected: true, // TODO: Set to false once done
+      preSelected: false,
     },
   )
 })
