@@ -1,7 +1,6 @@
 import { ERROR, VALID_DOCUMENT_TYPES } from '../constants'
 import { CombatNote, CombatNoteData, DocumentDragDropData } from '../models'
 import { Frequency } from '../models/frequencies'
-import { AnyDocument } from '../types'
 
 export function mapNoteToJournalEntryData(note: CombatNote): CombatNoteData {
   return {
@@ -67,7 +66,7 @@ export async function getNoteFromStorageData(data: CombatNoteData): Promise<{ er
 export async function mapNoteToDocument(note: CombatNote): Promise<{
   uuid: string
   error?: string
-  document?: AnyDocument
+  document?: JournalEntry | JournalEntryPage
 }> {
   const doc = (await fromUuid(note.uuid)) as JournalEntry | null
 
