@@ -1,7 +1,6 @@
 import { MODULE_HOOKS } from '../constants'
 import { CombatNote } from '../models'
 import { Frequency } from '../models/frequencies'
-import { AnyDocument } from '../types'
 import { mapNoteToDocument } from './combatNoteMapper'
 import { loadNotes, saveNotes } from './storage'
 
@@ -26,7 +25,7 @@ export class CombatNoteLoader {
     Hooks.call(MODULE_HOOKS.UpdateNotes)
   }
 
-  private renderNote(note: CombatNote, document?: AnyDocument) {
+  private renderNote(note: CombatNote, document?: JournalEntry | JournalEntryPage) {
     if (!document) {
       return
     }

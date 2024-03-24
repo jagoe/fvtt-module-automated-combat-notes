@@ -2,6 +2,7 @@
   "compilerOptions": {
     "types": [
       "@league-of-foundry-developers/foundry-vtt-types",
+      "./src/ts/typings.d.ts"
     ],
     "target": "ESNext",
     "useDefineForClassFields": true,

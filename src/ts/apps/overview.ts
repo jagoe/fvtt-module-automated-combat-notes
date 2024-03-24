@@ -230,7 +230,6 @@ export default class AcnOverview extends Application {
 
   private async handleNotesUpdate(): Promise<void> {
     this.notes = await loadNotes()
-    console.debug(200, { notes: this.notes })
     this.render(false, { renderData: this.getData() })
   }
 
