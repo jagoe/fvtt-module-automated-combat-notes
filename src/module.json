@@ -31,5 +31,10 @@
   "esmodules": [
     "scripts/module.js"
   ],
-  "socket": true
+  "socket": true,
+  "url": "https://github.com/jagoe/fvtt-module-automated-combat-notes",
+  "readme": "https://github.com/jagoe/fvtt-module-automated-combat-notes/blob/main/README.md",
+  "changelog": "https://github.com/jagoe/fvtt-module-automated-combat-notes/releases",
+  "bugs": "https://github.com/jagoe/fvtt-module-automated-combat-notes/issues",
+  "allowBugReporter": true
 }
