@@ -2,6 +2,7 @@ import { MODULE_HOOKS } from '../constants'
 import { CombatNote } from '../models'
 import { Frequency } from '../models/frequencies'
 import { mapNoteToDocument } from './combatNoteMapper'
+import { getJournalOpener } from './journal-openers/journal-opener'
 import { loadNotes, saveNotes } from './storage'
 
 export class CombatNoteLoader {
@@ -30,8 +31,6 @@ export class CombatNoteLoader {
       return
     }
 
-    const documentName = document.documentName as string | null | undefined
-
     this.countUp(note)
 
     if (!this.shouldBeDisplayed(note)) {
@@ -40,27 +39,8 @@ export class CombatNoteLoader {
 
     this.reset(note)
 
-    switch (documentName) {
-      case 'JournalEntry':
-        this.renderJournalEntry(document as JournalEntry)
-        break
-      case 'JournalEntryPage':
-        this.renderJournalEntryPage(document.parent as JournalEntry, document.id, note.anchor?.slug)
-        break
-      default:
-        // Invalid document type, so we just ignore it
-        return
-    }
-  }
-
-  private renderJournalEntry(entry: JournalEntry) {
-    entry.sheet?.render(true)
-  }
-
-  private renderJournalEntryPage(entry: JournalEntry, pageId: string | null, slug?: string) {
-    const renderOptions = { pageId, anchor: slug } as any // Hacky, but the typing seem to be outdated
-
-    return entry.sheet?.render(true, renderOptions)
+    const journalOpener = getJournalOpener()
+    journalOpener.openJournalEntry(document, note.anchor?.slug)
   }
 
   private countUp(note: CombatNote) {
