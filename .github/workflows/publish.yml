@@ -46,3 +46,29 @@ jobs:
           artifacts: "./dist/module.json, ./dist/module.zip"
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
+
+      - name: Read module data
+        id: get_module_data
+        if: ${{ ! github.event.release.prerelease }}
+        uses: ActionsTools/read-json-action@main
+        with:
+          file_path: dist/module.json
+
+      - name: Add new package version on Foundry
+        if: ${{ ! github.event.release.prerelease }}
+        run: |
+          curl -X POST \
+            https://api.foundryvtt.com/_api/packages/release_version/ \
+            --header "Content-Type: application/json" \
+            --header "Authorization: ${{secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN}}" \
+            --data-binary @- <<EOF
+            {
+              "id": "${{steps.get_module_data.outputs.id}}",
+              "release": {
+                "version": "${{steps.get_version.outputs.version}}",
+                "manifest": "https://github.com/jagoe/fvtt-module-automated-combat-notes/releases/download/${{steps.get_version.outputs.version}}/module.json",
+                "notes": "https://github.com/jagoe/fvtt-module-automated-combat-notes/releases/tag/${{steps.get_version.outputs.version}}",
+                "compatibility": ${{steps.get_module_data.outputs.compatibility}}
+              }
+            }
+            EOF
