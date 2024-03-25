@@ -6,7 +6,12 @@ export async function getNoteFromDragDropData(data: DocumentDragDropData): Promi
   error?: string
   note?: CombatNote
 }> {
-  const combatNoteData: CombatNoteData = { ...data, frequency: Frequency.Always, frequencyInterval: undefined }
+  const combatNoteData: CombatNoteData = {
+    ...data,
+    frequency: Frequency.Always,
+    frequencyInterval: 0,
+    frequencyCounter: 0,
+  }
   return await getNoteFromStorageData(combatNoteData)
 }
 
