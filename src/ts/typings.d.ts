@@ -1,4 +1,4 @@
-import { Game } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/head'
+import '@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/head'
 
 export {}
 

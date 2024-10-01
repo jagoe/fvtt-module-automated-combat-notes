@@ -78,6 +78,7 @@ Hooks.on('quenchReady', (quench) => {
 
           it('should register the combat start hook', () => {
             // Arrange
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const allEvents: Record<string, []> = (Hooks as any).events
             const combatStartEvent = allEvents[FOUNDRY_EVENT.CombatStart]
 
@@ -87,6 +88,7 @@ Hooks.on('quenchReady', (quench) => {
 
           it('should register the combat round hook', () => {
             // Arrange
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const allEvents: Record<string, []> = (Hooks as any).events
             const combatTurnEvents = allEvents[FOUNDRY_EVENT.CombatRound]
 
@@ -144,9 +146,9 @@ Hooks.on('quenchReady', (quench) => {
           // Spy on the keybinding action
           const keybinding = _game.keybindings.get(MODULE_ID, KEYBINDING.ShowOverview)[0]
           const action = _game.keybindings.activeKeys
-            .get(keybinding.key)
-            ?.find((k) => k.action === `${MODULE_ID}.${KEYBINDING.ShowOverview}`)!
-          const originalKeybinding = action.onDown!
+            .get(keybinding.key)!
+            .find((k) => k.action === `${MODULE_ID}.${KEYBINDING.ShowOverview}`)!
+          const originalKeybinding = action.onDown
           const keybindingSpy = sinon.spy()
 
           // Spy on the overview rendering
