@@ -71,4 +71,4 @@ jobs:
                 "compatibility": ${{steps.get_module_data.outputs.compatibility}}
               }
             }
-            EOF
+          EOF
