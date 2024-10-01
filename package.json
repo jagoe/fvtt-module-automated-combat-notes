@@ -10,21 +10,22 @@
     "watch": "tsc && vite build --watch",
     "build:tests": "tsc && vite --mode testing build",
     "watch:tests": "tsc && vite --mode testing build --watch",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint src"
   },
   "devDependencies": {
     "@ethaks/fvtt-quench": "^0.9.2",
     "@league-of-foundry-developers/foundry-vtt-types": "^9.280.0",
     "@types/sinon": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^7.3.1",
-    "@typescript-eslint/parser": "^7.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
     "chai": "^5.1.0",
-    "chai-wait-for": "^1.1.0",
-    "eslint": "^8.57.0",
+    "chai-wait-for": "^2.0.2",
+    "eslint": "^9.11.1",
+    "prettier-eslint": "^16.3.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-scss": "^4.0.0",
     "sass": "^1.54.8",
-    "sinon": "^17.0.1",
+    "sinon": "^19.0.2",
     "typescript": "^5.4.2",
     "vite": "^5.1.6"
   }

@@ -66,6 +66,7 @@ Hooks.on('quenchReady', (quench) => {
 
       describe('Combat Notes Overview', () => {
         let journalEntry: StoredDocument<JournalEntry>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let journalEntryPage: StoredDocument<any>
 
         before(async () => {
@@ -242,7 +243,7 @@ Hooks.on('quenchReady', (quench) => {
           await expectThatEventually.timeout(5000)(() => journalEntry.sheet?.rendered).is.true
         })
 
-        describe('Frequency', () => {
+        describe.skip('Frequency', () => {
           it('should not display a note with a frequency of "never"', () => {
             //
           })
