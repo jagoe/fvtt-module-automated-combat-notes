@@ -12,13 +12,13 @@ let module: ACN
 Hooks.once('init', () => {
   console.log(`${MODULE_NAME} | Initializing`)
 
-  const _game = game as Game
+  const _game = game as foundry.Game
   module = _game.modules.get(MODULE_ID) as ACN
   module.overview = new AcnOverview()
   module.loader = new CombatNoteLoader()
   module.socket = new ModuleSocket()
 
-  _game.keybindings.register(MODULE_ID, KEYBINDING.ShowOverview, {
+  _game.keybindings?.register(MODULE_ID, KEYBINDING.ShowOverview, {
     name: 'ACN.overview.open.keybinding.label',
     hint: 'ACN.overview.open.keybinding.hint',
     editable: [

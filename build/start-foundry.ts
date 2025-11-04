@@ -10,10 +10,13 @@ const fvttVersion = (
     type: 'select',
     name: 'value',
     message: 'Select the FoundryVTT version you want to use.',
-    choices: Object.keys(foundryConfig.fvtt).map((version) => ({
-      title: version,
-      value: version,
-    })),
+    choices: Object.keys(foundryConfig.fvtt)
+      .map((version) => version)
+      .sort((a, b) => -a.localeCompare(b))
+      .map((version) => ({
+        title: version,
+        value: version,
+      })),
   })
 ).value as number
 

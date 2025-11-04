@@ -1,16 +1,10 @@
 {
   "compilerOptions": {
-    "types": [
-      "@league-of-foundry-developers/foundry-vtt-types",
-      "@ethaks/fvtt-quench",
-    ],
+    "types": ["@league-of-foundry-developers/foundry-vtt-types", "@ethaks/fvtt-quench"],
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "moduleResolution": "Node",
     "strict": true,
     "sourceMap": true,
@@ -25,7 +19,5 @@
     "noImplicitAny": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

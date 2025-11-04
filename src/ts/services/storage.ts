@@ -3,7 +3,7 @@ import { CombatNote, CombatNoteData } from '../models'
 import { getNoteFromStorageData } from './combatNoteMapper'
 
 export async function saveNotes(notes: CombatNoteData[]) {
-  const _game = game as Game
+  const _game = game as foundry.Game
 
   if (!_game.user) {
     ui.notifications?.error(ERROR.MissingUser, { localize: true, permanent: true })
@@ -14,7 +14,7 @@ export async function saveNotes(notes: CombatNoteData[]) {
 }
 
 export async function loadNotes(): Promise<CombatNote[]> {
-  const _game = game as Game
+  const _game = game as foundry.Game
 
   const storedNoteData = (_game.user?.getFlag(MODULE_ID, COMBAT_NOTE_STORAGE_TYPE) as CombatNoteData[]) ?? []
   const noteResults = await Promise.all(

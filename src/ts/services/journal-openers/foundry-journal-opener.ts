@@ -3,15 +3,15 @@ import { JournalOpener } from './journal-opener'
 export class FoundryJournalOpener implements JournalOpener {
   public openJournalEntry(document: JournalEntry | JournalEntryPage, anchor?: string) {
     switch (document.documentName) {
-    case 'JournalEntry':
-      FoundryJournalOpener.renderJournalEntry(document as JournalEntry)
-      break
-    case 'JournalEntryPage':
-      FoundryJournalOpener.renderJournalEntryPage(document.parent, document.id, anchor)
-      break
-    default:
-      // Invalid document type, so we just ignore it
-      return
+      case 'JournalEntry':
+        FoundryJournalOpener.renderJournalEntry(document as JournalEntry)
+        break
+      case 'JournalEntryPage':
+        FoundryJournalOpener.renderJournalEntryPage(document.parent, document.id, anchor)
+        break
+      default:
+        // Invalid document type, so we just ignore it
+        return
     }
   }
 
@@ -21,7 +21,7 @@ export class FoundryJournalOpener implements JournalOpener {
 
   private static renderJournalEntryPage(entry: JournalEntry, pageId: string | null, slug?: string) {
     // Hacky, but the typing seem to be outdated
-    const renderOptions = { pageId, anchor: slug } as unknown as Application.RenderOptions<FormApplicationOptions>
+    const renderOptions = { pageId, anchor: slug } as unknown as Application.RenderOptions
 
     return entry.sheet?.render(true, renderOptions)
   }

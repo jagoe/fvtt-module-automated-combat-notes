@@ -7,14 +7,14 @@ import { loadNotes, saveNotes } from './storage'
 
 export class CombatNoteLoader {
   public async displayNotes() {
-    const _game = game as Game
+    const _game = game as foundry.Game
     const notes = await loadNotes()
 
     const mapResults = await Promise.all(notes.map(async (note) => ({ note, ...(await mapNoteToDocument(note)) })))
 
     const errors = mapResults.filter((result) => result.error !== undefined)
     errors.forEach(({ uuid, error }) =>
-      ui.notifications?.error(_game.i18n.format(error!, { uuid }), { permanent: true }),
+      ui.notifications?.error(_game.i18n?.format(error!, { uuid }), { permanent: true }),
     )
 
     mapResults

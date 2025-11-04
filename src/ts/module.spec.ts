@@ -1,13 +1,16 @@
 import sinon from 'sinon'
 import { FOUNDRY_EVENT, KEYBINDING, MODULE_ID, MODULE_NAME } from './constants'
 import { ACN } from './types'
+import { Quench } from '@ethaks/fvtt-quench'
 
-Hooks.on('quenchReady', (quench) => {
+const KeyboardManager = foundry.helpers.interaction.KeyboardManager
+
+Hooks.on('quenchReady', (quench: Quench) => {
   quench.registerBatch(
     `${MODULE_ID}.module`,
     (context) => {
-      const { describe, it, expect, before, after } = context
-      const _game = game as Game
+      const { describe, it, expect, before, after, afterEach } = context
+      const _game = game as foundry.Game
 
       describe('Initialization', () => {
         it('should register the module', () => {
@@ -20,7 +23,7 @@ Hooks.on('quenchReady', (quench) => {
 
         it('should register the keybinding to open the notes overview', () => {
           // Arrange
-          const keybindings = _game.keybindings.get(MODULE_ID, KEYBINDING.ShowOverview)
+          const keybindings = _game.keybindings!.get(MODULE_ID, KEYBINDING.ShowOverview)
 
           // Assert
           expect(keybindings).to.have.length(1)
@@ -144,9 +147,9 @@ Hooks.on('quenchReady', (quench) => {
 
         describe('Notes overview keybinding', () => {
           // Spy on the keybinding action
-          const keybinding = _game.keybindings.get(MODULE_ID, KEYBINDING.ShowOverview)[0]
-          const action = _game.keybindings.activeKeys
-            .get(keybinding.key)!
+          const keybinding = _game.keybindings!.get(MODULE_ID, KEYBINDING.ShowOverview)[0]
+          const action = _game
+            .keybindings!.activeKeys.get(keybinding.key)!
             .find((k) => k.action === `${MODULE_ID}.${KEYBINDING.ShowOverview}`)!
           const originalKeybinding = action.onDown
           const keybindingSpy = sinon.spy()
@@ -180,10 +183,12 @@ Hooks.on('quenchReady', (quench) => {
 
           it('should toggle the overview app when the keybinding gets triggered', async () => {
             // Arrange
-            const context = {} as KeyboardEventContext
+            const context = {} as KeyboardManager.KeyboardEventContext
 
             // Act - Toggle on
-            originalKeybinding(context)
+            if (originalKeybinding) {
+              originalKeybinding(context)
+            }
 
             // Assert
             expect(toggleSpy.called).to.be.true

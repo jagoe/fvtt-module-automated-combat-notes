@@ -1,36 +1,52 @@
+import type { ApplicationV2 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/applications/api/_module.mjs'
 import { ERROR, MODULE_HOOKS, MODULE_ID, VALID_DOCUMENT_TYPES } from '../constants'
 import { FREQUENCY_OPTIONS, Frequency } from '../models/frequencies'
 import { CombatNote, CombatNoteData } from '../models/note'
 import { getNoteFromDragDropData } from '../services/combatNoteMapper'
 import { loadNotes, saveNotes } from '../services/storage'
 
-export default class AcnOverview extends Application {
+type AcnOverviewRenderContext = ApplicationV2.RenderContext & {
+  notes: CombatNote[]
+  frequencyOptions: typeof FREQUENCY_OPTIONS
+}
+
+type MixedType = ApplicationV2<AcnOverviewRenderContext> & { new (): ApplicationV2<AcnOverviewRenderContext> }
+
+const { ApplicationV2: ApplicationV2Class, HandlebarsApplicationMixin } = foundry.applications.api
+export default class AcnOverview extends (HandlebarsApplicationMixin(
+  ApplicationV2Class<AcnOverviewRenderContext>,
+) as MixedType) {
   private notes: CombatNote[] = []
 
   private get game() {
-    return game as Game
+    return game as foundry.Game
   }
 
   override get title(): string {
-    return this.game.i18n.localize('ACN.overview.title')
+    return this.game.i18n?.localize('ACN.overview.title') ?? 'ACN.overview.title'
   }
 
-  public toggle(): void {
-    if (this.rendered) {
-      this.close()
-    } else {
-      this.render(true)
-    }
-  }
-
-  static override get defaultOptions(): ApplicationOptions {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+  static DEFAULT_OPTIONS() {
+    const options: Partial<ApplicationV2.Configuration> = {
+      uniqueId: MODULE_ID,
       id: 'acn-overview',
+      classes: ['application'],
+      position: {
+        width: 720,
+        height: 720,
+      },
+      window: {
+        resizable: true,
+      } as ApplicationV2.WindowConfiguration,
+    }
+
+    return options
+  }
+
+  static PARTS = {
+    overview: {
       template: `modules/${MODULE_ID}/templates/overview.hbs`,
-      width: 720,
-      height: 720,
-      resizable: true,
-    }) as ApplicationOptions
+    },
   }
 
   constructor() {
@@ -40,7 +56,9 @@ export default class AcnOverview extends Application {
     Handlebars.registerHelper('isFrequencyWithInterval', this.isFrequencyWithInterval.bind(this))
   }
 
-  override async getData() {
+  protected override async _prepareContext(
+    _options: CONST<ApplicationV2.RenderOptions> & { isFirstRender: boolean },
+  ): Promise<AcnOverviewRenderContext> {
     if (!this.notes.length) {
       this.notes = await loadNotes()
     }
@@ -51,18 +69,31 @@ export default class AcnOverview extends Application {
     }
   }
 
-  override activateListeners(html: JQuery<HTMLElement>): void {
-    super.activateListeners(html)
+  protected override _onRender(
+    _context: CONST<AcnOverviewRenderContext>,
+    _options: CONST<ApplicationV2.RenderOptions>,
+  ): Promise<void> {
+    const dropTargets = this.element.querySelector('.notes-drop-target')
 
-    const dropTargets = html.find('.notes-drop-target')
+    dropTargets?.addEventListener('dragover', this.handleDragOver.bind(this))
+    dropTargets?.addEventListener('dragleave', this.handleDragLeave.bind(this))
+    dropTargets?.addEventListener('drop', this.handleDrop.bind(this))
 
-    dropTargets.on('dragover', this.handleDragOver.bind(this))
-    dropTargets.on('dragleave', this.handleDragLeave.bind(this))
-    dropTargets.on('drop', this.handleDrop.bind(this))
+    this.element.querySelector('.delete-note')?.addEventListener('click', this.handleRemoveNote.bind(this))
+    this.element.querySelector('[name=frequency]')?.addEventListener('change', this.handleChangeFrequency.bind(this))
+    this.element
+      .querySelector('[name=frequency-interval]')
+      ?.addEventListener('change', this.handleChangeFrequencyInterval.bind(this))
 
-    html.find('.delete-note').on('click', this.handleRemoveNote.bind(this))
-    html.find('[name=frequency]').on('change', this.handleChangeFrequency.bind(this))
-    html.find('[name=frequency-interval]').on('change', this.handleChangeFrequencyInterval.bind(this))
+    return Promise.resolve()
+  }
+
+  public toggle(): void {
+    if (this.rendered) {
+      this.close()
+    } else {
+      this.render(true)
+    }
   }
 
   public appendDisplayButton(element: HTMLElement): void {
@@ -84,8 +115,6 @@ export default class AcnOverview extends Application {
       this.render(true)
     })
     element.append(button)
-
-    logger.trace(1000000)
   }
 
   private registerNoteHooks(): void {
@@ -93,8 +122,10 @@ export default class AcnOverview extends Application {
     Hooks.on(MODULE_HOOKS.UpdateNotes, this.handleNotesUpdate.bind(this))
   }
 
-  private handleDragOver(event: JQuery.DragOverEvent) {
-    const data: CombatNoteData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+  private handleDragOver(event: Event) {
+    const dragEvent = event as DragEvent
+
+    const data: CombatNoteData | null = JSON.parse(dragEvent.dataTransfer?.getData('text/plain') ?? 'null')
 
     if (data === null || data.uuid === undefined) {
       return
@@ -113,13 +144,14 @@ export default class AcnOverview extends Application {
     event.preventDefault()
   }
 
-  private async handleDrop(event: JQuery.DropEvent) {
+  private async handleDrop(event: Event) {
     event.preventDefault()
+    const dragEvent = event as DragEvent
 
     const target = event.currentTarget as HTMLElement
     target.classList.remove('drag-over')
 
-    const data: CombatNoteData | null = JSON.parse(event.originalEvent?.dataTransfer?.getData('text/plain') ?? 'null')
+    const data: CombatNoteData | null = JSON.parse(dragEvent.dataTransfer?.getData('text/plain') ?? 'null')
 
     if (data === null || data.uuid === undefined) {
       // This either is not a valid journal entry or it's something else entirely; either way, we ignore it
@@ -149,14 +181,14 @@ export default class AcnOverview extends Application {
     this.render()
   }
 
-  private handleDragLeave(event: JQuery.DragLeaveEvent) {
+  private handleDragLeave(event: Event) {
     event.preventDefault()
 
     const target = event.currentTarget as HTMLElement
     target.classList.remove('drag-over')
   }
 
-  private async handleRemoveNote(event: JQuery.ClickEvent) {
+  private async handleRemoveNote(event: Event) {
     event.preventDefault()
 
     const button = event.currentTarget as HTMLElement
@@ -172,7 +204,7 @@ export default class AcnOverview extends Application {
     this.render()
   }
 
-  private async handleChangeFrequency(event: JQuery.ChangeEvent) {
+  private async handleChangeFrequency(event: Event) {
     const select = event.currentTarget as HTMLSelectElement
     const { uuid } = select.dataset
 
@@ -189,10 +221,10 @@ export default class AcnOverview extends Application {
     note.frequency = select.value as Frequency
 
     await saveNotes([...this.notes])
-    this.render(false, { renderData: this.getData() })
+    this.render(false)
   }
 
-  private async handleChangeFrequencyInterval(event: JQuery.ChangeEvent) {
+  private async handleChangeFrequencyInterval(event: Event) {
     const input = event.currentTarget as HTMLInputElement
     const { uuid } = input.dataset
 
@@ -206,12 +238,12 @@ export default class AcnOverview extends Application {
       return
     }
 
-    const interval = Number.isNumeric(input.value) ? parseInt(input.value, 10) : 0
+    const interval = Number.isNaN(input.value) ? 0 : parseInt(input.value, 10)
     note.frequencyInterval = interval < 0 ? 0 : interval
     note.frequencyCounter = 0
 
     await saveNotes([...this.notes])
-    this.render(false, { renderData: this.getData() })
+    this.render(false)
   }
 
   private handleJournalEntryUpdate(journal: JournalEntry): void {
@@ -237,7 +269,7 @@ export default class AcnOverview extends Application {
 
   private async handleNotesUpdate(): Promise<void> {
     this.notes = await loadNotes()
-    this.render(false, { renderData: this.getData() })
+    this.render(false)
   }
 
   private isFrequencyWithInterval(frequency: Frequency): boolean {

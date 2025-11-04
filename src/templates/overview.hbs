@@ -1,58 +1,60 @@
-<section>
-  <header class="flex-header">
-    <h1 class="grow-header">
-      {{localize "ACN.overview.title"}}
-    </h1>
-  </header>
-</section>
-<section class="acn-notes">
-  {{#if this.notes.length}}
-  <table>
-    <thead>
-      <tr>
-        <th>{{localize "ACN.overview.table.journalEntry"}}</th>
-        <th>{{localize "ACN.overview.table.frequency"}}</th>
-        <th>{{localize "ACN.overview.table.actions"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each this.notes}}
-      <tr>
-        <td>
-          {{{this.anchorElement}}}
-        </td>
-        <td class="frequency-column text-center">
-          <div class="frequency">
-            <select name="frequency" data-uuid="{{this.uuid}}">
-              {{selectOptions ../frequencyOptions selected=this.frequency localize=true}}
-            </select>
-            {{#if (isFrequencyWithInterval this.frequency)}}
-            <div class="frequency-interval">
-              <label for="frequency-interval-{{this.uuid}}">
-                N:
-              </label>
-              <input type="text" name="frequency-interval" id="frequency-interval-{{this.uuid}}"
-                data-uuid="{{this.uuid}}" value="{{this.frequencyInterval}}" />
-              ({{this.frequencyCounter}}/{{this.frequencyInterval}})
+<div>
+  <section>
+    <header class="flex-header">
+      <h1 class="grow-header">
+        {{localize "ACN.overview.title"}}
+      </h1>
+    </header>
+  </section>
+  <section class="acn-notes">
+    {{#if notes.length}}
+    <table>
+      <thead>
+        <tr>
+          <th>{{localize "ACN.overview.table.journalEntry"}}</th>
+          <th>{{localize "ACN.overview.table.frequency"}}</th>
+          <th>{{localize "ACN.overview.table.actions"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each notes}}
+        <tr>
+          <td>
+            {{{this.anchorElement}}}
+          </td>
+          <td class="frequency-column text-center">
+            <div class="frequency">
+              <select name="frequency" data-uuid="{{this.uuid}}">
+                {{selectOptions ../frequencyOptions selected=this.frequency localize=true}}
+              </select>
+              {{#if (isFrequencyWithInterval this.frequency)}}
+              <div class="frequency-interval">
+                <label for="frequency-interval-{{this.uuid}}">
+                  N:
+                </label>
+                <input type="text" name="frequency-interval" id="frequency-interval-{{this.uuid}}"
+                  data-uuid="{{this.uuid}}" value="{{this.frequencyInterval}}" />
+                ({{this.frequencyCounter}}/{{this.frequencyInterval}})
+              </div>
+              {{/if}}
             </div>
-            {{/if}}
-          </div>
-        </td>
-        <td class="actions-column text-center">
-          <a class="delete-note" data-uuid="{{this.uuid}}" title="Delete Note"><i class="fas fa-trash-alt"></i></a>
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
-  <div class="notes-drop-target">
-    <span class="text">{{localize "ACN.overview.drop-target.text"}}</span>
-    <i class="fas fa-plus"></i>
-  </div>
-  {{else}}
-  <div class="notes-drop-target">
-    <span class="text">{{localize "ACN.overview.drop-target.textEmpty"}}</span>
-    <i class="fas fa-plus"></i>
-  </div>
-  {{/if}}
-</section>
+          </td>
+          <td class="actions-column text-center">
+            <a class="delete-note" data-uuid="{{this.uuid}}" title="Delete Note"><i class="fas fa-trash-alt"></i></a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <div class="notes-drop-target">
+      <span class="text">{{localize "ACN.overview.drop-target.text"}}</span>
+      <i class="fas fa-plus"></i>
+    </div>
+    {{else}}
+    <div class="notes-drop-target">
+      <span class="text">{{localize "ACN.overview.drop-target.textEmpty"}}</span>
+      <i class="fas fa-plus"></i>
+    </div>
+    {{/if}}
+  </section>
+</div>
