@@ -65,20 +65,27 @@ export default class AcnOverview extends Application {
     html.find('[name=frequency-interval]').on('change', this.handleChangeFrequencyInterval.bind(this))
   }
 
-  public appendDisplayButton(element: JQuery<HTMLElement>): void {
-    if (element.find('.open-combat-notes').length) {
+  public appendDisplayButton(element: HTMLElement): void {
+    if (element.querySelector('.open-combat-notes')) {
       return
     }
 
-    const button = $(
-      `<a class="combat-button open-combat-notes" aria-label="Open Combat Notes Overview" role="button" data-tooltip="ACN.overview.open.tooltip">
+    const button = document.createElement('span')
+    button.innerHTML = `
+    <a
+      class="combat-button open-combat-notes"
+      aria-label="Open Combat Notes Overview"
+      role="button"
+      data-tooltip="ACN.overview.open.tooltip">
         <i class="fa-regular fa-note-sticky" />
-      </button>`,
-    )
-    button.on('click', () => {
+    </a>`
+
+    button.addEventListener('click', () => {
       this.render(true)
     })
     element.append(button)
+
+    logger.trace(1000000)
   }
 
   private registerNoteHooks(): void {

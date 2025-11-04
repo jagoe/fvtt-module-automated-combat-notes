@@ -1,0 +1,17 @@
+{
+  "pf2eRepoPath": "path/to/pf2e/system/repo",
+  "fvtt": {
+    "11": {
+      "appPath": "path/to/foundryvtt-11/folder",
+      "dataPath": "path/to/foundryvtt-11/data/folder"
+    },
+    "12": {
+      "appPath": "path/to/foundryvtt-12/folder",
+      "dataPath": "path/to/foundryvtt-11/data/folder"
+    },
+    "13": {
+      "appPath": "path/to/foundryvtt-13/folder",
+      "dataPath": "path/to/foundryvtt-11/data/folder"
+    }
+  }
+}

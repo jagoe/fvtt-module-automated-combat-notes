@@ -37,8 +37,16 @@ Hooks.once('init', () => {
   })
 })
 
-Hooks.on('renderCombatTracker', (_: Application, html: JQuery) => {
-  module.overview.appendDisplayButton(html.find('.combat-tracker-header .encounter-controls'))
+Hooks.on('renderCombatTracker', (_: Application, html: HTMLElement) => {
+  const combatTrackerControls = html.querySelector(
+    '.combat-tracker-header .encounter-controls .control-buttons.right',
+  ) as HTMLElement
+  if (!combatTrackerControls) {
+    logger.warn('Could not find combat tracker controls to attach combat notes display button to')
+    return
+  }
+
+  module.overview.appendDisplayButton(combatTrackerControls)
 })
 
 Hooks.on(FOUNDRY_EVENT.CombatStart, () => {
