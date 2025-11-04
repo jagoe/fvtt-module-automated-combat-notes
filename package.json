@@ -10,6 +10,8 @@
     "watch": "tsc && vite build --watch",
     "build:tests": "tsc && vite --mode testing build",
     "watch:tests": "tsc && vite --mode testing build --watch",
+    "foundry": "tsx ./build/start-foundry.ts",
+    "link": "tsx ./build/link-foundry.ts",
     "lint": "eslint src"
   },
   "devDependencies": {
@@ -22,10 +24,12 @@
     "chai-wait-for": "^2.0.2",
     "eslint": "^9.11.1",
     "prettier-eslint": "^16.3.0",
+    "prompts": "^2.4.2",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-scss": "^4.0.0",
     "sass": "^1.54.8",
     "sinon": "^19.0.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.4.2",
     "vite": "^5.1.6"
   }
