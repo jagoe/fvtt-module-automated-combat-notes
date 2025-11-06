@@ -5,13 +5,16 @@ import { ACN, CombatNoteData } from '../types'
 import { expectThatEventually } from './helpers/expectToEventually'
 import { loadNoteData } from './helpers/loadNotes'
 import { waitFor } from './helpers/waitFor'
+import { Quench } from '@ethaks/fvtt-quench'
 
-Hooks.on('quenchReady', (quench) => {
+const KeyboardManager = foundry.helpers.interaction.KeyboardManager
+
+Hooks.on('quenchReady', (quench: Quench) => {
   quench.registerBatch(
     `${MODULE_ID}.e2e`,
     (context) => {
-      const { describe, it, expect } = context
-      const _game = game as Game
+      const { describe, it, expect, before, after, afterEach } = context
+      const _game = game as foundry.Game
       const module = _game.modules.get(MODULE_ID) as ACN
       const overview = module.overview
 
@@ -31,7 +34,7 @@ Hooks.on('quenchReady', (quench) => {
 
         it('should toggle the combat notes overview open when pressing the keybinding', async () => {
           // Arrange
-          const keybindings = _game.keybindings.get(MODULE_ID, KEYBINDING.ShowOverview)
+          const keybindings = _game.keybindings!.get(MODULE_ID, KEYBINDING.ShowOverview)
           const keybinding = keybindings[0]
           await overview.close() // Ensure the overview is closed
 
@@ -48,7 +51,7 @@ Hooks.on('quenchReady', (quench) => {
 
         it('should toggle the combat notes overview closed when pressing the keybinding', async () => {
           // Arrange
-          const keybindings = _game.keybindings.get(MODULE_ID, KEYBINDING.ShowOverview)
+          const keybindings = _game.keybindings!.get(MODULE_ID, KEYBINDING.ShowOverview)
           const keybinding = keybindings[0]
           await overview.render(true) // Ensure the overview is open
 
@@ -65,9 +68,8 @@ Hooks.on('quenchReady', (quench) => {
       })
 
       describe('Combat Notes Overview', () => {
-        let journalEntry: StoredDocument<JournalEntry>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let journalEntryPage: StoredDocument<any>
+        let journalEntry: JournalEntry
+        let journalEntryPage: JournalEntryPage
 
         before(async () => {
           const doc = await JournalEntry.create({
@@ -204,7 +206,7 @@ Hooks.on('quenchReady', (quench) => {
       })
 
       describe('Displaying notes', () => {
-        let journalEntry: StoredDocument<JournalEntry>
+        let journalEntry: JournalEntry
 
         before(async () => {
           const doc = await JournalEntry.create({

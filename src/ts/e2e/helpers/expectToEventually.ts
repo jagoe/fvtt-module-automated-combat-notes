@@ -1,3 +1,4 @@
+import * as chai from 'chai'
 import chaiWaitFor, { bindWaitFor } from 'chai-wait-for'
 
 chai.use(chaiWaitFor)

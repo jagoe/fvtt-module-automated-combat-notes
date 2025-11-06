@@ -5,7 +5,7 @@ export class MonksEnhancedJournalOpener implements JournalOpener {
   public static MODULE_ID = 'monks-enhanced-journal'
 
   private static get _game() {
-    return game as Game
+    return game as foundry.Game
   }
 
   public static isActive(): boolean {
