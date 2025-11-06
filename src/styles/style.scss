@@ -1,14 +1,8 @@
-#sidebar .combat-sidebar {
-  .combat-tracker-header {
-    nav.encounters {
-      a.combat-button:last-of-type {
-        margin-left: auto;
-      }
-    }
-  }
+.combat-button.open-combat-notes {
+  color: var(--color-text-primary);
 }
 
-.window-app .window-content section.acn-notes {
+.acn-overview section.acn-notes {
   flex: 100;
 
   td.text-center {

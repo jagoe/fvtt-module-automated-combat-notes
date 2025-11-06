@@ -46,6 +46,7 @@ export default class AcnOverview extends (HandlebarsApplicationMixin(
   static PARTS = {
     overview: {
       template: `modules/${MODULE_ID}/templates/overview.hbs`,
+      classes: ['acn-overview'],
     },
   }
 
