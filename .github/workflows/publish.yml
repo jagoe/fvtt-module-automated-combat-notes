@@ -49,7 +49,6 @@ jobs:
 
       - name: Read module data
         id: get_module_data
-        if: ${{ ! github.event.release.prerelease }}
         uses: ActionsTools/read-json-action@main
         with:
           file_path: dist/module.json
@@ -58,12 +57,13 @@ jobs:
         if: ${{ ! github.event.release.prerelease }}
         run: |
           curl -X POST \
-            https://api.foundryvtt.com/_api/packages/release_version/ \
+            https://foundryvtt.com/_api/packages/release_version/ \
             --header "Content-Type: application/json" \
             --header "Authorization: ${{secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN}}" \
             --data-binary @- <<EOF
             {
               "id": "${{steps.get_module_data.outputs.id}}",
+              "dry-run": ${{ github.event.release.prerelease }},
               "release": {
                 "version": "${{steps.get_version.outputs.version-without-v}}",
                 "manifest": "https://github.com/jagoe/fvtt-module-automated-combat-notes/releases/download/${{github.event.release.tag_name}}/module.json",
